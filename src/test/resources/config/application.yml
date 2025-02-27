@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: foody
+  jackson:
+    serialization:
+      write-durations-as-timestamps: false
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          authority-prefix: ''
+          authorities-claim-name: auth
+  task:
+    execution:
+      thread-name-prefix: foody-task-
+      pool:
+        core-size: 1
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: foody-scheduling-
+      pool:
+        size: 20
+
+server:
+  port: 10344
+  address: localhost
+
+foody:
+  clientApp:
+    name: 'foodyApp'
+  logging:
+    # To test json console appender
+    use-json-format: false
+    logstash:
+      enabled: false
+      host: localhost
+      port: 5000
+      ring-buffer-size: 512
+  security:
+    authentication:
+      jwt:
+        # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
+        base64-secret: YmRmNWFlOGRhZWQzNTZkZmFiMDM5ZjhlNTIxNWZjNDAyY2QzMmNhYjIzZDA1YmFjNGIwYzgwM2IxNGM3NWUwMGVmOGU2NjJhNjQxMDgxMTZjZmNiYmUyOTA2NTVlMWZkN2E2MGRhNTU1Mjk0ZmI5MWNkYzg5Mjk4OWNmOTg3Mjc=
+        # Token is valid 24 hours
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 86400
