@@ -34,27 +34,19 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<spring-boot.version>${project.parent.version}</spring-boot.version>
 		<start-class>dev.FoodyApplication</start-class>
-
-		<mapstruct.version>1.6.3</mapstruct.version>
-		<maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
-		<maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
 		<maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-		<maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
 		<maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
 		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-		<maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
-		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-		<maven-site-plugin.version>3.21.0</maven-site-plugin.version>
 		<maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-		<maven-war-plugin.version>3.4.0</maven-war-plugin.version>
-		<modernizer-maven-plugin.version>3.1.0</modernizer-maven-plugin.version>
-		<mapstruct.version>1.6.3</mapstruct.version>
-		<properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <org.projectlombok.version>1.18.34</org.projectlombok.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <libphonenumber.version>8.13.38</libphonenumber.version>
+        <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
 		<resource.delimiter>@</resource.delimiter>
 		<config.version>1.4.3</config.version>
-		<sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
-		<spotless-maven-plugin.version>2.44.2</spotless-maven-plugin.version>
 		<jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
 		<spring.profiles.active>dev</spring.profiles.active>
 		<springdoc-openapi-starter-webmvc-api.version>2.7.0</springdoc-openapi-starter-webmvc-api.version>
@@ -122,7 +114,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
+            <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -182,6 +174,11 @@
 			<artifactId>jackson-databind-nullable</artifactId>
 			<version>${jackson-databind-nullable.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>${libphonenumber.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -237,35 +234,183 @@
 			</resource>
 		</resources>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-						<path>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-configuration-processor</artifactId>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${org.projectlombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok-mapstruct-binding</artifactId>
+                                <version>${lombok-mapstruct-binding.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.springframework.boot</groupId>
+                                <artifactId>spring-boot-configuration-processor</artifactId>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>build-info</id>
+                            <goals>
+                                <goal>build-info</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>repackage</id>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <mainClass>${start-class}</mainClass>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
+                        <trimStackTrace>false</trimStackTrace>
+                        <excludes>
+                            <exclude>**/*IntegrationTest*</exclude>
+                            <exclude>**/*IT*</exclude>
+                        </excludes>
+                        <systemPropertyVariables>
+                            <java.util.logging.config.file>src/test/resources/logback.xml</java.util.logging.config.file>
+                        </systemPropertyVariables>
+                        <properties>
+                            <configurationParameters>
+                                junit.jupiter.execution.parallel.enabled = true
+                                junit.jupiter.execution.parallel.mode.default = concurrent
+                            </configurationParameters>
+                        </properties>
+                    </configuration>
+                </plugin>
+
+                <!-- Integration tests -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <configuration>
+                                <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
+                                <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                                <runOrder>alphabetical</runOrder>
+                                <includes>
+                                    <include>**/*IT*</include>
+                                    <include>**/*IntegrationTest*</include>
+                                </includes>
+                                <argLine>@{argLine} -Dspring.profiles.active=${profile.test}</argLine>
+                                <additionalClasspathElements>
+                                    <additionalClasspathElement>${basedir}/target/classes</additionalClasspathElement>
+                                </additionalClasspathElements>
+                                <parallel>none</parallel>
+                                <systemPropertyVariables>
+                                    <org.slf4j.simpleLogger.defaultLogLevel>off</org.slf4j.simpleLogger.defaultLogLevel>
+                                    <logging.level.>OFF</logging.level.>
+                                    <log4j2.level>OFF</log4j2.level>
+                                    <log4j.rootLogger>OFF</log4j.rootLogger>
+                                    <LOG4J_LEVEL>OFF</LOG4J_LEVEL>
+                                    <SPRING_MAIN_BANNER-MODE>off</SPRING_MAIN_BANNER-MODE>
+                                </systemPropertyVariables>
+                            </configuration>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>pre-unit-tests</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <!-- Ensures that the code coverage report for unit tests is created after unit tests have been run -->
+                            <id>post-unit-test</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>pre-integration-tests</id>
+                            <goals>
+                                <goal>prepare-agent-integration</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <!-- Ensures that the code coverage report for integration tests is created after integration tests have been run -->
+                            <id>post-integration-tests</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report-integration</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
 	</build>
     <profiles>
         <profile>
@@ -275,6 +420,7 @@
             </activation>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
+                <profile.test>testdev</profile.test>
             </properties>
         </profile>
         <profile>

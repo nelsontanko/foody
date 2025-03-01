@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 spring:
   profiles:
     active: '@spring.profiles.active@'
@@ -36,9 +33,6 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-  messages:
-    basename: i18n/messages
-    cache-duration: PT1S # 1 second, see the ISO 8601 standard
   main:
     allow-bean-definition-overriding: true
   mvc:

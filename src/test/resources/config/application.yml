@@ -1,6 +1,10 @@
 spring:
   application:
     name: foody
+  profiles:
+    active:
+      - testdev
+
   jackson:
     serialization:
       write-durations-as-timestamps: false
@@ -14,13 +18,13 @@ spring:
           authorities-claim-name: auth
   task:
     execution:
-      thread-name-prefix: foody-task-
+      thread-name-prefix: venda-task-
       pool:
         core-size: 1
         max-size: 50
         queue-capacity: 10000
     scheduling:
-      thread-name-prefix: foody-scheduling-
+      thread-name-prefix: venda-scheduling-
       pool:
         size: 20
 
@@ -43,7 +47,8 @@ foody:
     authentication:
       jwt:
         # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
-        base64-secret: YmRmNWFlOGRhZWQzNTZkZmFiMDM5ZjhlNTIxNWZjNDAyY2QzMmNhYjIzZDA1YmFjNGIwYzgwM2IxNGM3NWUwMGVmOGU2NjJhNjQxMDgxMTZjZmNiYmUyOTA2NTVlMWZkN2E2MGRhNTU1Mjk0ZmI5MWNkYzg5Mjk4OWNmOTg3Mjc=
+        base64-secret: YTFlMDFjMzc0ZDAxY2RmNzdmMDQ5NjYxNGMwZWIyYWU4YWZkODNlYTJhOTkyOWJiZTFmZDVmMzhkN2Y4NWMxMDRmNjhmODQwODVlYzYwMmY3YmYwMmY1ZTVmZTkxZDQxYzM1ODM2ZTA5ODEwZjVkOTExMDA1ZTRjMTg1NjgwY2U=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 86400
+

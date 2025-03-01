@@ -1,6 +1,6 @@
 package dev.security;
 
-import dev.config.Constants;
+import dev.core.config.Constants;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
