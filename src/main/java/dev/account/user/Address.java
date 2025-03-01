@@ -3,6 +3,8 @@ package dev.account.user;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -12,7 +14,10 @@ import java.util.Objects;
 @Setter @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Address {
+@Table(name = "addresses")
+public class Address implements Serializable {
+
+    @Serial private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "address_sequence")
@@ -28,15 +33,18 @@ public class Address {
     @Column(nullable = false)
     private String city;
 
-    @Column(nullable = false)
     private String state;
 
     private String postalCode;
-    @Column(nullable = false)
+
     private String country;
 
     @Enumerated(EnumType.STRING)
     private AddressType type;
+
+    private Double latitude;
+
+    private Double longitude;
 
     private boolean isDefault;
 
