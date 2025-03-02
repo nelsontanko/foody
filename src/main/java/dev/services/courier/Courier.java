@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 
 /**
  * @author Nelson Tanko
@@ -31,13 +30,27 @@ public class Courier extends AbstractAuditingEntity<Long> {
     @Column(length = 15)
     private String phoneNumber;
 
-    @OneToOne
-    @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "id", nullable = false)
     private Restaurant restaurant;
 
     @Column(name = "is_available", nullable = false)
-    private Boolean isAvailable = true;
+    private boolean available;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean active;
 
     @Column(name = "available_from")
     private LocalDateTime availableFrom;
+
+    @PrePersist
+    protected void onCreate() {
+        this.available = true;
+        this.active = true;
+        this.availableFrom = LocalDateTime.now();
+    }
+    public void setUnavailableForDelivery() {
+        this.available = false;
+        this.availableFrom = LocalDateTime.now().plusMinutes(15);
+    }
 }

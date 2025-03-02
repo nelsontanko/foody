@@ -11,7 +11,12 @@ spring:
       enabled: true
       lifecycle-management: start-only
       file: compose.yaml
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          authority-prefix: ''
+          authorities-claim-name: auth
   jmx:
     enabled: false
   data:

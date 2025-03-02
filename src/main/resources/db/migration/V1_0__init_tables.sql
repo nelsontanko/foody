@@ -24,13 +24,9 @@ CREATE TABLE addresses (
     user_id BIGINT,
     street VARCHAR(255) NOT NULL,
     city VARCHAR(255) NOT NULL,
-    state VARCHAR(255),
-    postal_code VARCHAR(50),
     country VARCHAR(255),
-    type VARCHAR(50),
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
-    is_default BOOLEAN NOT NULL DEFAULT false,
     CONSTRAINT pk_address PRIMARY KEY (id)
 );
 
@@ -79,9 +75,12 @@ CREATE TABLE order_items (
 CREATE TABLE restaurants (
    id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
-    address_id BIGINT,
+    email VARCHAR(255),
+    phone_number VARCHAR(15),
+    is_active BOOLEAN NOT NULL DEFAULT true,
     is_available BOOLEAN NOT NULL DEFAULT true,
     available_from TIMESTAMP,
+    address_id BIGINT NOT NULL,
     created_by VARCHAR(50) NOT NULL,
     created_date TIMESTAMP WITHOUT TIME ZONE,
     last_modified_by VARCHAR(100),
@@ -107,9 +106,10 @@ CREATE TABLE couriers (
    id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
     phone_number VARCHAR(15),
-    restaurant_id BIGINT,
     is_available BOOLEAN NOT NULL DEFAULT true,
+    is_active BOOLEAN NOT NULL DEFAULT true,
     available_from TIMESTAMP,
+    restaurant_id BIGINT NOT NULL,
     created_by VARCHAR(50) NOT NULL,
     created_date TIMESTAMP WITHOUT TIME ZONE,
     last_modified_by VARCHAR(100),
@@ -149,10 +149,11 @@ ALTER TABLE order_items ADD CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCE
 ALTER TABLE order_items ADD CONSTRAINT fk_menu FOREIGN KEY (menu_id) REFERENCES menus(id);
 ALTER TABLE users ADD CONSTRAINT uq_users_email UNIQUE (email);
 ALTER TABLE users ADD CONSTRAINT uq_users_mobile_number UNIQUE (mobile_number);
+ALTER TABLE user_authority ADD CONSTRAINT fk_on_authority FOREIGN KEY (authority_name) REFERENCES authority (name);
+ALTER TABLE user_authority ADD CONSTRAINT fk_on_user FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE addresses ADD CONSTRAINT fk_address_user FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE restaurants ADD CONSTRAINT fk_restaurant_address FOREIGN KEY (address_id) REFERENCES addresses(id);
-ALTER TABLE couriers ADD CONSTRAINT fk_courier_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(id);
-ALTER TABLE ratings ADD CONSTRAINT fk_rating_user FOREIGN KEY (user_id) REFERENCES users(id);
+ALTER TABLE couriers ADD CONSTRAINT fk_courier_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(id);ALTER TABLE ratings ADD CONSTRAINT fk_rating_user FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE ratings ADD CONSTRAINT fk_rating_menu FOREIGN KEY (menu_id) REFERENCES menus(id);
 ALTER TABLE ratings ADD CONSTRAINT unique_user_menu_rating UNIQUE (user_id, menu_id);
 ALTER TABLE comments ADD CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(id);

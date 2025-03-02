@@ -70,8 +70,7 @@ public class AuthenticationService {
         String authorities = authentication.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(""));
-
+                .collect(Collectors.joining(" "));
         var now = Instant.now();
         Instant validity;
         if (rememberMe) {

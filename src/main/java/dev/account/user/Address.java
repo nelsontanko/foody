@@ -33,29 +33,19 @@ public class Address implements Serializable {
     @Column(nullable = false)
     private String city;
 
-    private String state;
-
-    private String postalCode;
-
     private String country;
-
-    @Enumerated(EnumType.STRING)
-    private AddressType type;
 
     private Double latitude;
 
     private Double longitude;
 
-    private boolean isDefault;
-
     @Override public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Address address = (Address) o;
-        return isDefault == address.isDefault && Objects.equals(id, address.id) && Objects.equals(user, address.user) && Objects.equals(street, address.street) && Objects.equals(city, address.city) && Objects.equals(state, address.state) && Objects.equals(postalCode, address.postalCode) && Objects.equals(country, address.country) && type == address.type;
+        return Objects.equals(id, address.id) && Objects.equals(user, address.user) && Objects.equals(street, address.street) && Objects.equals(city, address.city) && Objects.equals(country, address.country) && Objects.equals(latitude, address.latitude) && Objects.equals(longitude, address.longitude);
     }
 
     @Override public int hashCode() {
-        return Objects.hash(id, user, street, city, state, postalCode, country, type, isDefault);
+        return Objects.hash(id, user, street, city, country, latitude, longitude);
     }
 }
