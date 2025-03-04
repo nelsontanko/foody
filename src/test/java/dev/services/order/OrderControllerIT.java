@@ -17,7 +17,6 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Nelson Tanko
  */
-@Disabled(value = "Tests run in isolation, a little tweak will be needed to make them run together")
+@Disabled(value = "Tests run in isolation (individually), a little tweak will be needed to make them run together")
 class OrderControllerIT extends BaseWebIntegrationTest {
 
     @Autowired TestDataHelper testDataHelper;
@@ -47,6 +46,7 @@ class OrderControllerIT extends BaseWebIntegrationTest {
         testDataHelper.createUser("newuser@example.com", Set.of("ROLE_USER"));
 
         testDataHelper.createRestaurant("Gummy Bites", true, true, 88.99, 330.98);
+        testDataHelper.createRestaurant("Tasty Bites", true, true, 82.99, 322.98);
         testFood = testDataHelper.createFood();
     }
 
@@ -177,27 +177,6 @@ class OrderControllerIT extends BaseWebIntegrationTest {
                         .content(toJSON(orderRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.restaurantName").value("Bistro A"));
-    }
-
-    @Test
-    @Disabled
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-    void createOrder_WhenNearestRestaurantIsUnavailable_SkipsIt() throws Exception {
-        testDataHelper.createRestaurant("Inactive Spot", false, false, 40.7130, -74.0050);
-
-        testDataHelper.createRestaurant("Active Spot", true, true, 40.7306, -70.9352);
-
-        AddressDTO.Request deliveryAddress = new AddressDTO.Request("123 Main St", "Abuja", "Nigeria", 40.7128, -74.0060);
-
-        OrderDTO.Request orderRequest = new OrderDTO.Request();
-        orderRequest.setDeliveryAddress(deliveryAddress);
-        orderRequest.setOrderItems(List.of(new OrderItemDTO.Request(testFood.getId(), 1)));
-
-        mockMvc.perform(post("/api/order")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJSON(orderRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.restaurantName").value("Active Spot"));
     }
 
     @Test
