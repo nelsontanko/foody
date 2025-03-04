@@ -59,7 +59,7 @@ docker-shell:
 	docker exec -it $(APP_NAME) /bin/sh
 
 docker-compose-up:
-	$(DOCKER_COMPOSE) up --build
+	$(DOCKER_COMPOSE) up -d --build
 	@echo "All services started"
 
 docker-compose-down:
