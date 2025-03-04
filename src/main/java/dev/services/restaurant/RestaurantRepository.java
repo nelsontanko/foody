@@ -17,7 +17,5 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     List<Restaurant> findByAvailableAndActive(boolean available, boolean active);
 
-    List<Restaurant> findByNameContainingIgnoreCase(String name);
-
     boolean existsByName(String tastyBites);
 }

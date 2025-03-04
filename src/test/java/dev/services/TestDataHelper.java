@@ -5,7 +5,7 @@ import dev.services.comment.Comment;
 import dev.services.comment.CommentRepository;
 import dev.services.food.Food;
 import dev.services.food.FoodRepository;
-import dev.services.order.OrderRepository;
+import dev.services.order.*;
 import dev.services.rating.Rating;
 import dev.services.rating.RatingRepository;
 import dev.services.restaurant.*;
@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,6 +34,7 @@ public class TestDataHelper {
     @Autowired CourierRepository courierRepository;
     @Autowired OrderRepository orderRepository;
     @Autowired private AddressRepository addressRepository;
+    @Autowired private OrderItemRepository orderItemRepository;
 
     public void clearData(){
         commentRepository.deleteAll();
@@ -152,4 +156,58 @@ public class TestDataHelper {
                 .build();
         ratingRepository.save(newRating);
     }
+
+//    public Order createOrder(Restaurant restaurant, Food food, Address address, OrderStatus status, LocalDateTime orderTime) {
+//        Order order = new Order();
+//        order.setRestaurant(restaurant);
+//        order.setStatus(status);
+//        order.setOrderTime(orderTime);
+//        order.setTotalAmount(BigDecimal.TWO);
+//        order.setDeliveryAddress(address);
+//        order.setEstimatedDeliveryTime(orderTime.plusMinutes(15));
+//
+//        OrderItem item = new OrderItem();
+//        item.setFood(food);
+//        item.setQuantity(1);
+//        item.setPrice(food.getPrice());
+//        item.setOrder(order);
+//        orderItemRepository.saveAndFlush(item);
+//
+//        return orderRepository.save(order);
+//    }
+
+    public Address createAddress(){
+        Address address = Address.builder().city("Abuja").street("123 main").country("Nigeria").latitude(23.44).longitude(238.0).build();
+        return addressRepository.saveAndFlush(address);
+    }
+    public Order createOrder(User user, Restaurant restaurant, Address deliveryAddress, Food food, int quantity) {
+        Order order = new Order();
+        order.setUser(user);
+        order.setRestaurant(restaurant);
+        order.setDeliveryAddress(deliveryAddress);
+        order.setTotalAmount(BigDecimal.ZERO);
+        order.setStatus(OrderStatus.DELIVERING);
+        order.setOrderTime(LocalDateTime.now());
+        order.setEstimatedDeliveryTime(order.getOrderTime().plusMinutes(15));
+
+        order = orderRepository.save(order);
+
+        List<OrderItem> orderItems = new ArrayList<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setFood(food);
+        orderItem.setQuantity(quantity);
+        orderItem.setPrice(food.getPrice());
+        orderItem.setOrder(order);
+        orderItems.add(orderItem);
+
+        totalAmount = totalAmount.add(food.getPrice().multiply(BigDecimal.valueOf(quantity)));
+
+        order.setOrderItems(orderItems);
+        order.setTotalAmount(totalAmount);
+        return orderRepository.save(order);
+    }
+
 }
