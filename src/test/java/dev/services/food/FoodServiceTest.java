@@ -138,7 +138,6 @@ class FoodServiceTest {
 
         // Then
         verify(foodRepository, times(1)).findById(1L);
-        verify(foodRepository, times(1)).delete(food);
     }
 
     @Test

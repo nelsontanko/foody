@@ -97,6 +97,7 @@ CREATE TABLE food (
     price DECIMAL(19, 2) NOT NULL,
     image_url VARCHAR(255),
     is_available BOOLEAN NOT NULL DEFAULT true,
+    is_active BOOLEAN NOT NULL DEFAULT true,
     average_rating DOUBLE PRECISION,
     total_ratings INTEGER,
     created_by VARCHAR(50) NOT NULL,

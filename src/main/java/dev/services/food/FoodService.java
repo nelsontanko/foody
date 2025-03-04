@@ -75,8 +75,9 @@ public class FoodService {
         LOG.info("Deleting Food with id: {}", foodId);
 
         Food food = findFoodById(foodId);
+        food.setActive(false);
 
-        foodRepository.delete(food);
+        foodRepository.save(food);
         LOG.info("Food deleted successfully with id: {}", foodId);
     }
 

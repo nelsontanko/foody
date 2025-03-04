@@ -51,8 +51,12 @@ public class Food extends AbstractAuditingEntity<Long> {
     @Column(name = "is_available", columnDefinition = "boolean default true")
     private boolean available;
 
+    @Column(name = "is_active", columnDefinition = "boolean default true")
+    private boolean active;
+
     @PrePersist
     protected void onCreate(){
+        this.active = true;
         this.available = true;
     }
 

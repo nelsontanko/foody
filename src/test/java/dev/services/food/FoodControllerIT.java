@@ -114,8 +114,8 @@ class FoodControllerIT extends BaseWebIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        Optional<Food> deletedFood = foodRepository.findById(food.getId());
-        assertThat(deletedFood).isEmpty();
+        Food deletedFood = foodRepository.findById(food.getId()).orElseThrow();
+        assertThat(deletedFood.isActive()).isFalse();
     }
 
     @Test
