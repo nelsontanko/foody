@@ -1,7 +1,7 @@
 package dev.account.web;
 
-import dev.account.user.AuthenticationService;
 import dev.account.dto.JWTTokenDTO;
+import dev.account.user.AuthenticationService;
 import dev.account.web.vm.LoginVM;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ import java.security.Principal;
  * @author Nelson Tanko
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/account")
 public class AuthenticationController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationController.class);
@@ -40,7 +40,7 @@ public class AuthenticationController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBasicAuth(jwt);
-        return new ResponseEntity<>(new JWTTokenDTO(jwt), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new JWTTokenDTO("Login successful", jwt), httpHeaders, HttpStatus.OK);
     }
 
     /**

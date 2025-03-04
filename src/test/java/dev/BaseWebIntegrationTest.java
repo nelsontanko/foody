@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.LOWER_CAMEL_CASE;
@@ -13,6 +14,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.LOWER_CAME
  * @author Nelson Tanko
  */
 @FoodyWebIntegrationTest
+@Sql(value = {"/scripts/authority.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 public class BaseWebIntegrationTest {
 
     @Autowired

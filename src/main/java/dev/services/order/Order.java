@@ -1,21 +1,25 @@
 package dev.services.order;
 
-import dev.account.AbstractAuditingEntity;
 import dev.account.user.Address;
 import dev.account.user.User;
-import dev.services.courier.Courier;
+import dev.core.common.AbstractAuditingEntity;
 import dev.services.restaurant.Restaurant;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Nelson Tanko
  */
 @Entity
 @Getter @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "orders")
 public class Order extends AbstractAuditingEntity<Long> {
 
@@ -33,19 +37,19 @@ public class Order extends AbstractAuditingEntity<Long> {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @ManyToOne
-    @JoinColumn(name = "courier_id", nullable = false)
-    private Courier courier;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(nullable = false)
-    private BigDecimal totalPrice;
+    private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status = OrderStatus.PENDING;
 
-    @Column(name = "order_date", nullable = false)
-    private LocalDateTime orderDate;
+    private LocalDateTime orderTime;
+
+    private LocalDateTime estimatedDeliveryTime;
 
     @ManyToOne
     @JoinColumn(name = "delivery_address_id", nullable = false)

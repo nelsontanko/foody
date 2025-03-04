@@ -1,10 +1,9 @@
 package dev.services.restaurant;
 
-import dev.account.AbstractAuditingEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.account.user.Address;
+import dev.core.common.AbstractAuditingEntity;
 import dev.core.validation.ValidEmail;
-import dev.core.validation.ValidMobileNumber;
-import dev.services.courier.Courier;
 import dev.services.order.Order;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,6 +17,7 @@ import java.util.Set;
  */
 @Entity
 @Getter @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "restaurants")
@@ -35,12 +35,7 @@ public class Restaurant extends AbstractAuditingEntity<Long> {
     @ValidEmail
     private String email;
 
-    @ValidMobileNumber
     private String phoneNumber;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = false)
-    private Address address;
 
     @Column(name = "is_available", nullable = false)
     private boolean available;
@@ -54,6 +49,10 @@ public class Restaurant extends AbstractAuditingEntity<Long> {
     @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private Courier courier;
 
+    @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    private Address address;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "restaurant")
     private Set<Order> orders = new HashSet<>();
 
@@ -61,16 +60,17 @@ public class Restaurant extends AbstractAuditingEntity<Long> {
     protected void onCreate() {
         this.available = true;
         this.active = true;
-        this.availableFrom = LocalDateTime.now();
     }
 
-    public void setUnavailableForDelivery() {
+    public void markAsBusy() {
         this.available = false;
         this.availableFrom = LocalDateTime.now().plusMinutes(15);
     }
 
-    public boolean shouldBeAvailable() {
-        return !this.available && this.availableFrom != null &&
-                LocalDateTime.now().isAfter(this.availableFrom);
+    public void markAsAvailable() {
+        if (!available && availableFrom != null && LocalDateTime.now().isAfter(availableFrom)) {
+            this.available = true;
+            this.availableFrom = null;
+        }
     }
 }

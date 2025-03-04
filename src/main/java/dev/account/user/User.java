@@ -1,11 +1,9 @@
 package dev.account.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import dev.account.AbstractAuditingEntity;
+import dev.core.common.AbstractAuditingEntity;
 import dev.core.validation.ValidEmail;
-import dev.core.validation.ValidMobileNumber;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -54,10 +52,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(length = 100, unique = true, nullable = false)
     private String email;
 
-    @ValidMobileNumber
-    @Column(unique = true, length = 15)
-    private String mobileNumber;
-
     @Size(max = 20)
     @JsonIgnore
     private String resetKey;
@@ -89,11 +83,11 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(password, user.password) && Objects.equals(fullname, user.fullname) && Objects.equals(email, user.email) && Objects.equals(mobileNumber, user.mobileNumber) && Objects.equals(resetKey, user.resetKey) && Objects.equals(resetDate, user.resetDate) && status == user.status && Objects.equals(addresses, user.addresses) && Objects.equals(authorities, user.authorities);
+        return Objects.equals(id, user.id) && Objects.equals(password, user.password) && Objects.equals(fullname, user.fullname) && Objects.equals(email, user.email) && Objects.equals(resetKey, user.resetKey) && Objects.equals(resetDate, user.resetDate) && status == user.status && Objects.equals(addresses, user.addresses) && Objects.equals(authorities, user.authorities);
     }
 
     @Override public int hashCode() {
-        return Objects.hash(id, password, fullname, email, mobileNumber, resetKey, resetDate, status, addresses, authorities);
+        return Objects.hash(id, password, fullname, email, resetKey, resetDate, status, addresses, authorities);
     }
 
     @Override public String toString() {
@@ -102,7 +96,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
                 ", password='" + password + '\'' +
                 ", fullname='" + fullname + '\'' +
                 ", email='" + email + '\'' +
-                ", mobileNumber='" + mobileNumber + '\'' +
                 ", resetKey='" + resetKey + '\'' +
                 ", resetDate=" + resetDate +
                 ", status=" + status +

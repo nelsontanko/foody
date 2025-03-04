@@ -2,10 +2,9 @@ package dev.services.restaurant;
 
 import dev.account.user.AddressDTO;
 import dev.core.validation.ValidEmail;
-import dev.core.validation.ValidMobileNumber;
-import dev.services.courier.CourierDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +17,7 @@ public class RestaurantDTO {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Request {
@@ -27,12 +27,15 @@ public class RestaurantDTO {
         @ValidEmail
         private String email;
 
-        @ValidMobileNumber
         private String phoneNumber;
 
-        private AddressDTO.Request address;
-
+        @Valid
+        @NotNull(message = "Courier is required")
         private CourierDTO.Request courier;
+
+        @Valid
+        @NotNull(message = "Address is required")
+        private AddressDTO.Request address;
     }
 
     @Data
@@ -41,24 +44,12 @@ public class RestaurantDTO {
     public static class Response {
         private Long id;
         private String name;
-        private AddressDTO.Response address;
-        private String phoneNumber;
-        private String email;
-        private boolean available;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DetailedResponse {
-        private Long id;
-        private String name;
-        private AddressDTO.Response address;
         private String phoneNumber;
         private String email;
         private boolean active;
         private boolean available;
         private LocalDateTime availableFrom;
+        private AddressDTO.Response address;
         private CourierDTO.Response courier;
     }
 
@@ -71,10 +62,8 @@ public class RestaurantDTO {
         @ValidEmail
         private String email;
 
-        @ValidMobileNumber
         private String phoneNumber;
-
-        private boolean available;
+        private Boolean available;
         private CourierDTO.UpdateRequest courier;
     }
 }

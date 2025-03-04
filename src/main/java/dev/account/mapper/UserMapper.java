@@ -4,7 +4,6 @@ import dev.account.dto.AdminUserDTO;
 import dev.account.dto.UserDTO;
 import dev.account.user.Authority;
 import dev.account.user.User;
-import dev.core.validation.PhoneNumberConstraintValidator;
 import org.mapstruct.*;
 
 import java.util.*;
@@ -44,13 +43,7 @@ public interface UserMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "mobileNumber", qualifiedByName = "normalizePhoneNumber")
     void updateUserFromDTO(AdminUserDTO userDTO, @MappingTarget User user);
-
-    @Named("normalizePhoneNumber")
-    default String normalizePhoneNumber(String phoneNumber) {
-        return phoneNumber != null ? PhoneNumberConstraintValidator.normalize(phoneNumber) : null;
-    }
 
     @Named("authoritiesToStringSet")
     default Set<String> authoritiesToStringSet(Set<Authority> authorities) {
@@ -70,36 +63,5 @@ public interface UserMapper {
             authority.setName(name);
             return authority;
         }).collect(Collectors.toSet());
-    }
-
-    @Named("id")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    UserDTO toDtoId(User user);
-
-    @Named("idSet")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    Set<UserDTO> toDtoIdSet(Set<User> users);
-
-    @Named("login")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "email", source = "email")
-    UserDTO toDtoLogin(User user);
-
-    @Named("loginSet")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "email", source = "email")
-    Set<UserDTO> toDtoLoginSet(Set<User> users);
-
-    default User userFromId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        User user = new User();
-        user.setId(id);
-        return user;
     }
 }

@@ -1,17 +1,18 @@
 package dev.account.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * @author Nelson Tanko
  */
+@Data
+@AllArgsConstructor
 public class JWTTokenDTO {
 
+    private String message;
     private String token;
-
-    public JWTTokenDTO(String token) {
-        this.token = token;
-    }
 
     @JsonProperty("access_token")
     public String getToken() {

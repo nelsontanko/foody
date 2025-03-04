@@ -1,15 +1,16 @@
 package dev.services.restaurant;
 
-import dev.services.restaurant.RestaurantDTO.*;
+import dev.services.restaurant.RestaurantDTO.Request;
+import dev.services.restaurant.RestaurantDTO.Response;
+import dev.services.restaurant.RestaurantDTO.UpdateRequest;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author Nelson Tanko
@@ -17,8 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/restaurant")
 public class RestaurantController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RestaurantController.class);
 
     private final RestaurantService restaurantService;
 
@@ -38,25 +37,25 @@ public class RestaurantController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Response>> getAllRestaurants() {
-        return ResponseEntity.ok(restaurantService.getAllRestaurants());
+    public ResponseEntity<Page<Response>> getAllRestaurants(@PageableDefault final Pageable pageable) {
+        return ResponseEntity.ok(restaurantService.getAllRestaurants(pageable));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DetailedResponse> getRestaurantById(@PathVariable Long id) {
-        return ResponseEntity.ok(restaurantService.getRestaurantById(id));
+    @GetMapping("/{restaurantId}")
+    public ResponseEntity<Response> getRestaurantById(@PathVariable Long restaurantId) {
+        return ResponseEntity.ok(restaurantService.getRestaurantById(restaurantId));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{restaurantId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Response> updateRestaurant(@PathVariable Long id, @Valid @RequestBody UpdateRequest request) {
-        return ResponseEntity.ok(restaurantService.updateRestaurant(id, request));
+    public ResponseEntity<Response> updateRestaurant(@PathVariable Long restaurantId, @Valid @RequestBody UpdateRequest request) {
+        return ResponseEntity.ok(restaurantService.updateRestaurant(restaurantId, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{restaurantId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteRestaurant(@PathVariable Long id) {
-        restaurantService.deleteRestaurant(id);
+    public ResponseEntity<Void> deleteRestaurant(@PathVariable Long restaurantId) {
+        restaurantService.deleteRestaurant(restaurantId);
         return ResponseEntity.noContent().build();
     }
 }

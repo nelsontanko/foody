@@ -1,5 +1,7 @@
 package dev.account.user;
 
+import dev.core.common.AbstractAuditingEntity;
+import dev.services.restaurant.Restaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,10 +14,11 @@ import java.util.Objects;
  */
 @Entity
 @Setter @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "addresses")
-public class Address implements Serializable {
+public class Address extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 
@@ -26,6 +29,9 @@ public class Address implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Restaurant restaurant;
 
     @Column(nullable = false)
     private String street;
@@ -38,6 +44,22 @@ public class Address implements Serializable {
     private Double latitude;
 
     private Double longitude;
+
+    // Calculate distance between two locations using Haversine formula
+    public double distanceTo(Address other) {
+        final int R = 6371; // Radius of the earth in km
+
+        double latDistance = Math.toRadians(other.latitude - this.latitude);
+        double lonDistance = Math.toRadians(other.longitude - this.longitude);
+
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(this.latitude)) * Math.cos(Math.toRadians(other.latitude))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // Distance in km
+    }
 
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

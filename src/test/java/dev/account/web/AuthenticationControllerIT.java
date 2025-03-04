@@ -1,17 +1,13 @@
 package dev.account.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.BaseWebIntegrationTest;
-import dev.FoodyIntegrationTest;
 import dev.account.user.User;
 import dev.account.user.UserAccountRepository;
 import dev.account.web.vm.LoginVM;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.CoreMatchers.not;
@@ -44,7 +40,7 @@ class AuthenticationControllerIT extends BaseWebIntegrationTest {
         login.setPassword("test");
 
         this.mockMvc
-                .perform(post("/api/authenticate").contentType(MediaType.APPLICATION_JSON)
+                .perform(post("/api/account/authenticate").contentType(MediaType.APPLICATION_JSON)
                         .content(toJSON(login)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.access_token").isString())
@@ -67,7 +63,7 @@ class AuthenticationControllerIT extends BaseWebIntegrationTest {
         login.setRememberMe(true);
 
         this.mockMvc
-                .perform(post("/api/authenticate").contentType(MediaType.APPLICATION_JSON)
+                .perform(post("/api/account/authenticate").contentType(MediaType.APPLICATION_JSON)
                         .content(toJSON(login)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.access_token").isString())
@@ -83,7 +79,7 @@ class AuthenticationControllerIT extends BaseWebIntegrationTest {
         login.setPassword("wrong password");
 
         this.mockMvc
-                .perform(post("/api/authenticate").contentType(MediaType.APPLICATION_JSON)
+                .perform(post("/api/account/authenticate").contentType(MediaType.APPLICATION_JSON)
                         .content(toJSON(login)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.access_token").doesNotExist())

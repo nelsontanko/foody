@@ -1,13 +1,11 @@
 package dev.account.web;
 
-import dev.account.dto.AdminUserDTO;
-import dev.account.user.User;
+import dev.account.dto.*;
 import dev.account.user.UserAccountService;
-import dev.account.dto.PasswordChangeDTO;
 import dev.account.web.errors.AccountResourceException;
 import dev.account.web.errors.InvalidPasswordException;
-import dev.account.web.vm.*;
-import dev.core.utils.RandomUtils;
+import dev.account.web.vm.KeyAndPasswordVM;
+import dev.account.web.vm.ManagedUserVM;
 import dev.security.SecurityUtils;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +28,7 @@ import static org.springframework.http.HttpStatus.OK;
  * @author Nelson Tanko
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/account")
 public class AccountResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountResource.class);
@@ -43,46 +40,47 @@ public class AccountResource {
     }
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void register(@Valid @RequestBody ManagedUserVM managedUserVM){
+    public ResponseEntity<?> register(@Valid @RequestBody ManagedUserVM managedUserVM){
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
         userAccountService.register(managedUserVM, managedUserVM.getPassword());
+        return new ResponseEntity<>(Collections.singletonMap("message", "Registration successful"), HttpStatus.CREATED);
     }
 
     /**
      * {@code PATCH  /account} : Update the current user information.
      *
-     * @param userUpdateVM the user information to update.
+     * @param userUpdateDTO the user information to update.
      * @throws AccountResourceException {@code 404 (Not Found)} if the user couldn't be found.
      */
-    @PatchMapping("/update")
-    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping
     @PreAuthorize("hasAuthority('ROLE_USER') OR hasAuthority('ROLE_ADMIN')")
-    public void updateUserAccount(@Valid @RequestBody UserUpdateVM userUpdateVM) {
-        LOG.debug("REST request to update user account: {}", userUpdateVM);
+    public ResponseEntity<?> updateUserAccount(@Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+        LOG.debug("REST request to update user account: {}", userUpdateDTO);
 
         String currentUserEmail = SecurityUtils.getCurrentUser()
                 .orElseThrow(() -> new AccountResourceException("Current user login not found"));
 
-        userAccountService.updateUser(currentUserEmail, userUpdateVM);
+        userAccountService.updateUser(currentUserEmail, userUpdateDTO);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Information updated successfully"));
     }
 
     @PostMapping("/change-password")
-    public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
         if (isPasswordLengthInvalid(passwordChangeDto.newPassword())) {
             throw new InvalidPasswordException();
         }
         userAccountService.changePassword(passwordChangeDto.currentPassword(), passwordChangeDto.newPassword());
+        return ResponseEntity.ok(Collections.singletonMap("message", "Password changed successfully"));
     }
 
     @PostMapping(path = "/reset-password/init")
-    public ResponseEntity<?> requestPasswordReset(@RequestBody ResetEmailVM resetEmailVM) {
-        Optional<String> resetKey = userAccountService.requestPasswordReset(resetEmailVM.email());
+    public ResponseEntity<?> requestPasswordReset(@RequestBody ResetEmailDTO resetEmailDTO) {
+        Optional<String> resetKey = userAccountService.requestPasswordReset(resetEmailDTO.email());
         if (resetKey.isPresent()) {
             // This could be where email is sent, but I am not implementing email sending for this
-            LOG.info("Password reset key generated for {}", resetEmailVM.email());
+            LOG.info("Password reset key generated for {}", resetEmailDTO.email());
             return ResponseEntity.ok(Collections.singletonMap("resetKey", resetKey.get()));
         } else {
             // Pretend the request has been successful to prevent checking which emails really exist
@@ -97,7 +95,7 @@ public class AccountResource {
         if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }
-        String message = userAccountService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
+        String message = userAccountService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getResetKey());
 
         return ResponseEntity.ok(Collections.singletonMap("message", message));
     }
@@ -108,7 +106,7 @@ public class AccountResource {
      * @return the current user.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
-    @GetMapping("/account")
+    @GetMapping
     @ResponseStatus(OK)
     public AdminUserDTO getAccount() {
         return userAccountService

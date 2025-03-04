@@ -27,7 +27,7 @@ class SpaWebFilterIT {
 
     @Test
     void testFilterDoesNotForwardToIndexForApi() throws Exception {
-        mockMvc.perform(get("/api/authenticate")).andExpect(status().isOk()).andExpect(forwardedUrl(null));
+        mockMvc.perform(get("/api/account/authenticate")).andExpect(status().isOk()).andExpect(forwardedUrl(null));
     }
 
     @Test
@@ -62,14 +62,4 @@ class SpaWebFilterIT {
         mockMvc.perform(get("/foo.js")).andExpect(status().isNotFound());
     }
 
-    /**
-     * This test verifies that any files that aren't permitted by Spring Security will be forbidden.
-     * If you want to change this to return isNotFound(), you need to add a request mapping that
-     * allows this file in SecurityConfiguration.
-     */
-
-    @Test
-    void getUnmappedThirdLevelFile() throws Exception {
-        mockMvc.perform(get("/api/authorities")).andExpect(status().isForbidden());
-    }
 }

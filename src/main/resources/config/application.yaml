@@ -54,6 +54,9 @@ spring:
       thread-name-prefix: foody-scheduling-
       pool:
         size: 2
+      shutdown:
+        await-termination: true
+        await-termination-period: 10s
 
 foody:
   clientApp:

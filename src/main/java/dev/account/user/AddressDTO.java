@@ -1,9 +1,7 @@
 package dev.account.user;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * @author Nelson Tanko
@@ -13,13 +11,13 @@ public class AddressDTO {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Request {
         @NotBlank(message = "Street is required")
         private String street;
 
-        @NotBlank(message = "City is required")
         private String city;
 
         private String country;

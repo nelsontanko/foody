@@ -1,8 +1,6 @@
 package dev;
 
-import dev.core.config.AsyncSyncConfiguration;
 import dev.core.config.EmbeddedSQL;
-import dev.core.config.JacksonConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.annotation.*;

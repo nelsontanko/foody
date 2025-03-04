@@ -5,18 +5,14 @@ import dev.security.AuthoritiesConstants;
 import dev.security.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,11 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -69,11 +60,11 @@ public class SecurityConfiguration {
                         .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
                         .requestMatchers(mvc.pattern("/app/**")).permitAll()
                         .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
-                        .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/authenticate")).permitAll()
-                        .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/register")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/reset-password/init")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/reset-password/finish")).permitAll()
+                        .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/account/authenticate")).permitAll()
+                        .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/account/authenticate")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/account/register")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
                         .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                         .requestMatchers(mvc.pattern("/api/**")).authenticated()
                         .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()

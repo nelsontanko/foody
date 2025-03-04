@@ -1,9 +1,9 @@
 package dev.services.order;
 
-import dev.services.menu.Menu;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.services.food.Food;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -11,7 +11,10 @@ import java.math.BigDecimal;
  * @author Nelson Tanko
  */
 @Entity
+@Builder
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "order_items")
 public class OrderItem {
 
@@ -23,18 +26,20 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnore
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu menu;
+    @JoinColumn(name = "food_id", nullable = false)
+    private Food food;
 
     @Column(nullable = false)
-    private Integer quantity;
+    private int quantity;
 
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(nullable = false)
-    private BigDecimal subtotal;
+    public BigDecimal getSubtotal() {
+        return price.multiply(BigDecimal.valueOf(quantity));
+    }
 }

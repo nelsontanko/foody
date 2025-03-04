@@ -1,17 +1,19 @@
 package dev.services.comment;
 
-import dev.account.AbstractAuditingEntity;
 import dev.account.user.User;
-import dev.services.menu.Menu;
+import dev.core.common.AbstractAuditingEntity;
+import dev.services.food.Food;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * @author Nelson Tanko
  */
 @Entity
 @Getter @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "comments")
 public class Comment extends AbstractAuditingEntity<Long> {
 
@@ -21,13 +23,13 @@ public class Comment extends AbstractAuditingEntity<Long> {
     @Column(nullable = false, updatable = false)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu menu;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "food_id", nullable = false)
+    private Food food;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;

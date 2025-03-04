@@ -41,13 +41,6 @@ public class AuthorityResource {
         this.authorityRepository = authorityRepository;
     }
 
-    /**
-     * {@code POST  /authorities} : Create a new authority.
-     *
-     * @param authority the authority to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new authority, or with status {@code 400 (Bad Request)} if the authority has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping
     public ResponseEntity<Authority> createAuthority(@Valid @RequestBody Authority authority) throws URISyntaxException {
         LOG.debug("REST request to save Authority : {}", authority);
@@ -60,23 +53,12 @@ public class AuthorityResource {
                 .body(authority);
     }
 
-    /**
-     * {@code GET  /authorities} : get all the authorities.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of authorities in body.
-     */
     @GetMapping
     public List<Authority> getAllAuthorities() {
         LOG.debug("REST request to get all Authorities");
         return authorityRepository.findAll();
     }
 
-    /**
-     * {@code GET  /authorities/:id} : get the "id" authority.
-     *
-     * @param id the id of the authority to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the authority, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<Authority> getAuthority(@PathVariable("id") String id) {
         LOG.debug("REST request to get Authority : {}", id);
@@ -84,12 +66,6 @@ public class AuthorityResource {
         return ResponseUtils.wrapOrNotFound(authority);
     }
 
-    /**
-     * {@code DELETE  /authorities/:id} : delete the "id" authority.
-     *
-     * @param id the id of the authority to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuthority(@PathVariable("id") String id) {
         LOG.debug("REST request to delete Authority : {}", id);

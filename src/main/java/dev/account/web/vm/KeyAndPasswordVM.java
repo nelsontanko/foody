@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 public class KeyAndPasswordVM {
 
-    private String key;
+    private String resetKey;
 
     private String newPassword;
 }

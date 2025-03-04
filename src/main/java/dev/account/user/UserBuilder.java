@@ -31,11 +31,6 @@ public class UserBuilder {
         return this;
     }
 
-    public UserBuilder withMobileNumber(String mobileNumber) {
-        user.setMobileNumber(mobileNumber);
-        return this;
-    }
-
     public UserBuilder withResetDetails(LocalDateTime resetDate, String resetKey) {
         user.setResetDate(resetDate);
         user.setResetKey(resetKey);

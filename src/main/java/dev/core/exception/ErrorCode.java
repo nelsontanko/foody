@@ -17,24 +17,23 @@ public enum ErrorCode {
     GENERAL_UPLOAD_FILE_IS_NOT_PHOTO("api.general.fileNotAPhoto", HttpStatus.BAD_REQUEST),
     // User
     USER_NOT_FOUND("api.user.notFound", HttpStatus.NOT_FOUND),
-    USER_PROFILE_INVALID_PHONE("api.user.invalidPhoneNumber", HttpStatus.BAD_REQUEST),
     USER_NOT_LOGGED_IN("api.user.notLoggedIn", HttpStatus.BAD_REQUEST),
-
-    // Admins
-    ONLY_ADMINS_PROVIDE_IDS("api.admin.onlyAdminsRequireId", HttpStatus.CONFLICT),
+    USER_ADDRESS_NOT_FOUND("api.user.addressNotFound", HttpStatus.BAD_REQUEST),
 
     // Oder
     ORDER_NOT_FOUND("api.order.notFound", HttpStatus.NOT_FOUND),
     ORDER_CANNOT_BE_CANCELED("api.order.cannotBeCanceled", HttpStatus.CONFLICT),
 
-    // Review
-    REVIEW_ALREADY_REVIEWED_BY_USER("api.review.alreadyReviewedByUser", HttpStatus.CONFLICT),
-    REVIEW_NOT_FOUND("api.review.notFound", HttpStatus.NOT_FOUND),
-
     // Restaurant
     RESTAURANT_NOT_FOUND("api.restaurant.notFound", HttpStatus.NOT_FOUND),
-    RESTAURANT_ALREADY_EXISTS("api.restaurant.AlreadyExists", HttpStatus.BAD_REQUEST),;
+    RESTAURANT_ALREADY_EXISTS("api.restaurant.AlreadyExists", HttpStatus.BAD_REQUEST),
+    RESTAURANT_UNAVAILABLE_FOR_DELIVERY("api.restaurant.noRestaurantAvailableForDelivery", HttpStatus.NOT_FOUND),
+    RESTAURANT_ADDRESS_ALREADY_EXISTS("api.restaurant.addressAlreadyExists", HttpStatus.BAD_REQUEST),
 
+    // Food
+    FOOD_ALREADY_EXISTS("api.food.AlreadyExists", HttpStatus.BAD_REQUEST),
+    FOOD_NOT_FOUND("api.food.notFound", HttpStatus.NOT_FOUND),
+    ;
 
     private final String message;
     private final HttpStatus httpStatus;

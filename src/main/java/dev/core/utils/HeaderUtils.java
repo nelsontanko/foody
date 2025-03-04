@@ -1,6 +1,5 @@
 package dev.core.utils;
 
-import org.apache.tomcat.util.http.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;

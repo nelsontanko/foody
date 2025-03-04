@@ -16,8 +16,6 @@ public interface UserAccountRepository extends JpaRepository<User, Long> {
 
     Optional<User> findOneByEmailIgnoreCase(String email);
 
-    Optional<User> findOneByMobileNumber(String mobileNumber);
-
     Optional<User> findOneByResetKey(String resetKey);
 
     @EntityGraph(attributePaths = "authorities")

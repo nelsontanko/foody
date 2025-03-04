@@ -23,15 +23,11 @@ public final class SecurityUtils {
 
     private SecurityUtils() {}
 
-    /**
-     * Get the login of the current user.
-     *
-     * @return the login of the current user.
-     */
     public static Optional<String> getCurrentUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
     }
+
 
     private static String extractPrincipal(Authentication authentication) {
         if (authentication == null) {

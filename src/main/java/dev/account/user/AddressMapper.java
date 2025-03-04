@@ -11,7 +11,7 @@ public interface AddressMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
-    Address toEntity(AddressDTO.Request addressCreateDto);
+    Address toEntity(AddressDTO.Request request);
 
     AddressDTO.Response toDto(Address address);
 }

@@ -5,9 +5,7 @@ import dev.account.user.Authority;
 import dev.account.user.User;
 import dev.account.user.UserStatus;
 import dev.core.validation.ValidEmail;
-import dev.core.validation.ValidMobileNumber;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,9 +31,6 @@ public class AdminUserDTO implements Serializable {
 
     private String fullname;
 
-    @ValidMobileNumber
-    private String mobileNumber;
-
     @ValidEmail
     @NotNull(message = "Email is required")
     private String email;
@@ -56,7 +51,6 @@ public class AdminUserDTO implements Serializable {
         this.id = user.getId();
         this.fullname = user.getFullname();
         this.email = user.getEmail();
-        this.mobileNumber = user.getMobileNumber();
         this.status = user.getStatus();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
@@ -71,7 +65,6 @@ public class AdminUserDTO implements Serializable {
         return "UserDTO{" +
                 "id=" + id +
                 ", fullname='" + fullname + '\'' +
-                ", mobileNumber='" + mobileNumber + '\'' +
                 ", email='" + email + '\'' +
                 ", status=" + status +
                 ", createdBy='" + createdBy + '\'' +

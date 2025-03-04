@@ -8,11 +8,14 @@ import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
+import java.time.Duration;
 import java.util.concurrent.Executor;
 
 @Configuration
@@ -39,6 +42,22 @@ public class AsyncConfiguration implements AsyncConfigurer {
         executor.setQueueCapacity(taskExecutionProperties.getPool().getQueueCapacity());
         executor.setThreadNamePrefix(taskExecutionProperties.getThreadNamePrefix());
         return new ExceptionHandlingAsyncTaskExecutor(executor);
+    }
+
+    @Bean(name = "taskScheduler")
+    public TaskScheduler taskScheduler() {
+        LOG.debug("Creating Task Scheduler with shared task execution properties");
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+
+        scheduler.setPoolSize(taskExecutionProperties.getPool().getMaxSize());
+        scheduler.setThreadNamePrefix("task-scheduler-");
+
+        Duration terminationPeriod = taskExecutionProperties.getShutdown().getAwaitTerminationPeriod();
+        scheduler.setAwaitTerminationSeconds(terminationPeriod != null ? (int) terminationPeriod.getSeconds() : 0);
+        scheduler.setWaitForTasksToCompleteOnShutdown(taskExecutionProperties.getShutdown().isAwaitTermination());
+
+        scheduler.initialize();
+        return scheduler;
     }
 
     @Override

@@ -1,7 +1,6 @@
 INSERT INTO authority (name)
 VALUES
     ('ROLE_ADMIN'),
-    ('ROLE_USER'),
-    ('ROLE_SELLER')
+    ('ROLE_USER')
 ON CONFLICT (name) DO NOTHING;
 

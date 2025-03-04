@@ -1,11 +1,12 @@
 package dev.account.user;
 
 import dev.account.dto.AdminUserDTO;
+import dev.account.dto.UserUpdateDTO;
 import dev.account.mapper.UserMapper;
-import dev.account.web.errors.*;
-import dev.account.web.vm.UserUpdateVM;
+import dev.account.web.errors.AccountResourceException;
+import dev.account.web.errors.EmailAlreadyUsedException;
+import dev.account.web.errors.InvalidPasswordException;
 import dev.core.utils.RandomUtils;
-import dev.core.validation.PhoneNumberConstraintValidator;
 import dev.security.AuthoritiesConstants;
 import dev.security.SecurityUtils;
 import org.slf4j.Logger;
@@ -68,13 +69,13 @@ public class UserAccountService {
         LOG.debug("Created Information for User: {}", newUser);
     }
 
-    public void updateUser(String currentUserEmail, UserUpdateVM userUpdateVM) {
+    public void updateUser(String currentUserEmail, UserUpdateDTO userUpdateDTO) {
         LOG.debug("Request to update User: {}", currentUserEmail);
 
         User user = userAccountRepository.findOneByEmailIgnoreCase(currentUserEmail)
                 .orElseThrow(() -> new AccountResourceException("User could not be found"));
 
-        updateUserFields(user, userUpdateVM);
+        updateUserFields(user, userUpdateDTO);
 
         userAccountRepository.save(user);
         this.clearUserCaches(user);
@@ -166,24 +167,13 @@ public class UserAccountService {
                 .withBaseUser(userMapper.toUser(userDTO))
                 .withEmail(userDTO.getEmail().toLowerCase())
                 .withPassword(passwordEncoder.encode(config.getPassword()))
-                .withMobileNumber(normalizePhoneNumberIfPresent(userDTO.getMobileNumber()))
                 .build();
     }
 
-    private void updateUserFields(User user, UserUpdateVM userUpdateVM) {
-        String mobileNumber = userUpdateVM.getMobileNumber();
-        if (StringUtils.hasText(mobileNumber)) {
-            userAccountRepository.findOneByEmailIgnoreCase(mobileNumber)
-                    .ifPresent(existingUser -> {
-                        throw new EmailAlreadyUsedException();
-                    });
-        }
-        Optional.ofNullable(userUpdateVM.getFullname())
+    private void updateUserFields(User user, UserUpdateDTO userUpdateDTO) {
+        Optional.ofNullable(userUpdateDTO.getFullname())
                 .filter(StringUtils::hasText)
                 .ifPresent(user::setFullname);
-        Optional.ofNullable(mobileNumber)
-                .filter(StringUtils::hasText)
-                .ifPresent(user::setMobileNumber);
     }
 
     private void assignAuthorities(User user, Set<String> authorityStrings) {
@@ -211,19 +201,6 @@ public class UserAccountService {
                 .ifPresent(existingUser -> {
                     throw new EmailAlreadyUsedException();
                 });
-
-        Optional.ofNullable(userDTO.getMobileNumber())
-                .map(PhoneNumberConstraintValidator::normalize)
-                .flatMap(userAccountRepository::findOneByMobileNumber)
-                .ifPresent(existingUser -> {
-                    throw new MobileNumberAlreadyUsedException();
-                });
-    }
-
-    private String normalizePhoneNumberIfPresent(String phoneNumber) {
-        return Optional.ofNullable(phoneNumber)
-                .map(PhoneNumberConstraintValidator::normalize)
-                .orElse(null);
     }
 
     private void clearUserCaches(User user) {

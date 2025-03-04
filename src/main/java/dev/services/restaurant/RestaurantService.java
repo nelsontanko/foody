@@ -1,23 +1,22 @@
 package dev.services.restaurant;
 
+import dev.account.user.AddressMapper;
 import dev.account.user.AddressRepository;
 import dev.core.exception.ErrorCode;
 import dev.core.exception.GenericApiException;
-import dev.services.courier.Courier;
-import dev.services.courier.CourierMapper;
-import dev.services.courier.CourierRepository;
-import dev.services.restaurant.RestaurantDTO.*;
+import dev.services.restaurant.RestaurantDTO.Request;
+import dev.services.restaurant.RestaurantDTO.Response;
+import dev.services.restaurant.RestaurantDTO.UpdateRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
-import static dev.core.exception.ErrorCode.RESTAURANT_ALREADY_EXISTS;
 import static dev.core.exception.ErrorCode.RESTAURANT_NOT_FOUND;
 
 /**
@@ -28,31 +27,28 @@ public class RestaurantService {
     private static final Logger LOG = LoggerFactory.getLogger(RestaurantService.class);
 
     private final RestaurantRepository restaurantRepository;
-    private final CourierRepository courierRepository;
     private final AddressRepository addressRepository;
     private final RestaurantMapper restaurantMapper;
     private final CourierMapper courierMapper;
+    private final AddressMapper addressMapper;
 
-    public RestaurantService(RestaurantRepository restaurantRepository, CourierRepository courierRepository, AddressRepository addressRepository, RestaurantMapper restaurantMapper, CourierMapper courierMapper) {
+    public RestaurantService(RestaurantRepository restaurantRepository, AddressRepository addressRepository, RestaurantMapper restaurantMapper, CourierMapper courierMapper, AddressMapper addressMapper) {
         this.restaurantRepository = restaurantRepository;
-        this.courierRepository = courierRepository;
         this.addressRepository = addressRepository;
         this.restaurantMapper = restaurantMapper;
         this.courierMapper = courierMapper;
+        this.addressMapper = addressMapper;
     }
 
+    @Transactional
     public Response createRestaurant(@Valid Request request) {
         LOG.info("Creating restaurant: {}", request.getName());
 
-        Restaurant restaurant = restaurantMapper.toEntity(request);
-        if (addressRepository.existsByLatitudeAndLongitude(restaurant.getAddress().getLatitude(),
-                restaurant.getAddress().getLongitude())){
-            throw new GenericApiException(RESTAURANT_ALREADY_EXISTS);
+        if (isDuplicateAddress(request.getAddress().getLatitude(), request.getAddress().getLongitude())) {
+            throw new GenericApiException(ErrorCode.RESTAURANT_ADDRESS_ALREADY_EXISTS);
         }
-        Courier courier = courierMapper.toEntity(request.getCourier());
-
-        restaurant.setCourier(courier);
-        courier.setRestaurant(restaurant);
+        Restaurant restaurant = restaurantMapper.toEntity(request);
+        restaurantMapper.postProcess(restaurant);
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
         LOG.info("Restaurant created with ID: {}", savedRestaurant.getId());
@@ -60,45 +56,36 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<Response> getAllRestaurants() {
-        LOG.info("Fetching all restaurants");
-        List<Restaurant> restaurants = restaurantRepository.findByActiveTrue();
-        return restaurantMapper.toResponseDtoList(restaurants);
+    public Page<Response> getAllRestaurants(Pageable pageable) {
+        LOG.info("Fetching all active restaurants");
+        Page<Restaurant> restaurants = restaurantRepository.findByActiveTrueOrderByAvailableDesc(pageable);
+        return restaurants.map(restaurantMapper::toResponseDto);
     }
 
     @Transactional(readOnly = true)
-    public DetailedResponse getRestaurantById(Long id) {
-        LOG.info("Fetching restaurant with ID: {}", id);
-        Restaurant restaurant = findRestaurantById(id);
-        return restaurantMapper.toDetailedResponseDto(restaurant);
+    public Response getRestaurantById(Long restaurantId) {
+        LOG.info("Fetching restaurant with ID: {}", restaurantId);
+        Restaurant restaurant = findRestaurantById(restaurantId);
+        return restaurantMapper.toResponseDto(restaurant);
     }
 
     @Transactional
-    public Response updateRestaurant(Long id, UpdateRequest request) {
-        LOG.info("Updating restaurant with ID: {}", id);
-        Restaurant restaurant = findRestaurantById(id);
+    public Response updateRestaurant(Long restaurantId, UpdateRequest request) {
+        LOG.info("Updating restaurant with ID: {}", restaurantId);
+        Restaurant restaurant = findRestaurantById(restaurantId);
 
         restaurantMapper.updateRestaurantFromDto(request, restaurant);
+        updateCourier(request.getCourier(), restaurant);
 
-        // Update courier if exists
-        if (restaurant.getCourier() != null && request.getCourier() != null) {
-            courierMapper.updateCourierFromDto(request.getCourier(), restaurant.getCourier());
-        } else if (request.getCourier() != null) {
-            // Create a new courier if it doesn't exist
-            Courier courier = courierMapper.toEntityUpdate(request.getCourier());
-            courier.setRestaurant(restaurant);
-            restaurant.setCourier(courier);
-        }
         Restaurant updatedRestaurant = restaurantRepository.save(restaurant);
-
         LOG.info("Restaurant updated: {}", updatedRestaurant.getId());
         return restaurantMapper.toResponseDto(updatedRestaurant);
     }
 
     @Transactional
-    public void deleteRestaurant(Long id) {
-        LOG.info("Deleting restaurant with ID: {}", id);
-        Restaurant restaurant = findRestaurantById(id);
+    public void deleteRestaurant(Long restaurantId) {
+        LOG.info("Deleting restaurant with ID: {}", restaurantId);
+        Restaurant restaurant = findRestaurantById(restaurantId);
 
         restaurant.setActive(false);
 
@@ -106,21 +93,28 @@ public class RestaurantService {
             restaurant.getCourier().setActive(false);
         }
         restaurantRepository.save(restaurant);
-        LOG.info("Restaurant soft deleted: {}", id);
+        LOG.info("Restaurant soft deleted: {}", restaurantId);
     }
 
-    private Restaurant findRestaurantById(Long id) {
-        return restaurantRepository.findById(id)
+    private Restaurant findRestaurantById(Long restaurantId) {
+        return restaurantRepository.findById(restaurantId)
                 .filter(Restaurant::isActive)
                 .orElseThrow(() -> new GenericApiException(RESTAURANT_NOT_FOUND));
     }
 
-    @Scheduled(fixedRate = 900000) // Run every 15 minute
-    @Transactional
-    public void updateAvailabilityStatus() {
-        LocalDateTime now = LocalDateTime.now();
-        restaurantRepository.updateAvailabilityStatus(now);
-        courierRepository.updateAvailabilityStatus(now);
-        LOG.debug("Updated availability status for restaurants and couriers");
+    private boolean isDuplicateAddress(Double latitude, Double longitude) {
+        return addressRepository.existsByLatitudeAndLongitude(latitude, longitude);
+    }
+
+    private void updateCourier(CourierDTO.UpdateRequest courierRequest, Restaurant restaurant) {
+        Optional.ofNullable(courierRequest).ifPresent(request -> {
+            if (restaurant.getCourier() != null) {
+                courierMapper.updateCourierFromDto(request, restaurant.getCourier());
+            } else {
+                Courier newCourier = courierMapper.toEntityUpdate(request);
+                newCourier.setRestaurant(restaurant);
+                restaurant.setCourier(newCourier);
+            }
+        });
     }
 }
