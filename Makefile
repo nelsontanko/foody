@@ -9,7 +9,7 @@ endif
 
 DOCKER_COMPOSE = docker-compose -f compose.yaml
 
-.PHONY: help build clean test run docker-build docker-push docker-run docker-stop \
+.PHONY: help build clean test run test-integration \
         docker-logs docker-shell docker-compose-up docker-compose-down db-connect
 
 help:
@@ -19,9 +19,6 @@ help:
 	@echo "  make test               - Run tests"
 	@echo "  make test-integration   - Run integration tests"
 	@echo "  make run                - Run the application locally"
-	@echo "  make docker-build       - Build the Docker image"
-	@echo "  make docker-run         - Run the application in Docker"
-	@echo "  make docker-stop        - Stop the Docker container"
 	@echo "  make docker-logs        - Show logs from the Docker container"
 	@echo "  make docker-shell       - Get a shell in the Docker container"
 	@echo "  make docker-push        - Push the Docker image to registry"
@@ -62,7 +59,7 @@ docker-shell:
 	docker exec -it $(APP_NAME) /bin/sh
 
 docker-compose-up:
-	$(DOCKER_COMPOSE) up -d --build
+	$(DOCKER_COMPOSE) up --build
 	@echo "All services started"
 
 docker-compose-down:
