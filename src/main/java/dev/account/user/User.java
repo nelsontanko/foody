@@ -26,14 +26,12 @@ import java.util.Set;
 @Builder
 @Getter @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "users")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
-
-    public User() {
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")

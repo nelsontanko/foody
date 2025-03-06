@@ -1,6 +1,7 @@
 package dev.account.user;
 
 import dev.account.dto.AdminUserDTO;
+import dev.account.dto.UserDTO;
 import dev.account.dto.UserUpdateDTO;
 import dev.account.mapper.UserMapper;
 import dev.account.web.errors.AccountResourceException;
@@ -12,6 +13,8 @@ import dev.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -73,7 +76,7 @@ public class UserAccountService {
                 });
     }
 
-    public void createUser(AdminUserDTO userDTO) {
+    public User createUser(AdminUserDTO userDTO) {
         User newUser = createUser(userDTO, UserCreateConfig.builder()
                 .password(RandomUtils.generatePassword())
                 .activated(true)
@@ -86,6 +89,7 @@ public class UserAccountService {
         userAccountRepository.save(newUser);
         this.clearUserCaches(newUser);
         LOG.debug("Created Information for User: {}", newUser);
+        return newUser;
     }
 
     public void updateUser(String currentUserEmail, UserUpdateDTO userUpdateDTO) {
@@ -99,6 +103,34 @@ public class UserAccountService {
         userAccountRepository.save(user);
         this.clearUserCaches(user);
         LOG.debug("Changed Information for User: {}", user);
+    }
+
+    /**
+     * Update all information for a specific user, and return the modified user.
+     *
+     * @param userDTO user to update.
+     * @return updated user.
+     */
+    public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
+        return userAccountRepository.findById(userDTO.getId())
+                .map(user -> {
+                    this.clearUserCaches(user);
+                    userMapper.updateUserFromDTO(userDTO, user);
+
+                    Set<Authority> managedAuthorities = user.getAuthorities();
+                    managedAuthorities.clear();
+                    userDTO.getAuthorities()
+                            .stream()
+                            .map(authorityRepository::findById)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .forEach(managedAuthorities::add);
+                    userAccountRepository.save(user);
+                    this.clearUserCaches(user);
+                    LOG.debug("Changed Information for user: {}", user);
+                    return user;
+                })
+                .map(AdminUserDTO::new);
     }
 
     public void deleteUser(String email) {
@@ -157,6 +189,21 @@ public class UserAccountService {
     public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUser()
                 .flatMap(userAccountRepository::findOneWithAuthoritiesByEmailIgnoreCase);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AdminUserDTO> getAllManagedUsers(Pageable pageable) {
+        return userAccountRepository.findAll(pageable).map(AdminUserDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> getUserWithAuthoritiesByEmail(String email) {
+        return userAccountRepository.findOneWithAuthoritiesByEmailIgnoreCase(email);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserDTO> getAllPublicUsers(Pageable pageable) {
+        return userAccountRepository.findAllByIdNotNullAndActivatedIsTrue(pageable).map(UserDTO::new);
     }
 
     /**
