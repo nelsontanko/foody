@@ -7,6 +7,7 @@ import dev.account.mapper.AuthorityMapper;
 import dev.account.user.*;
 import dev.account.web.vm.KeyAndPasswordVM;
 import dev.account.web.vm.ManagedUserVM;
+import dev.core.config.Constants;
 import dev.security.AuthoritiesConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -86,6 +87,7 @@ class AccountResourceIT extends BaseWebIntegrationTest {
         AdminUserDTO user = new AdminUserDTO();
         user.setEmail(TEST_USER_EMAIL);
         user.setFullname("john doe");
+        user.setLangKey("en");
         user.setAuthorities(authorities);
         userAccountService.createUser(user);
 
@@ -110,6 +112,7 @@ class AccountResourceIT extends BaseWebIntegrationTest {
         validUser.setEmail("test-register-valid@example.com");
         validUser.setPassword("password");
         validUser.setFullname("Alice Won");
+        validUser.setLangKey(Constants.DEFAULT_LANGUAGE);
         validUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
         assertThat(userAccountRepository.findOneByEmailIgnoreCase("test-register-valid@example.com")).isEmpty();
 
@@ -428,7 +431,7 @@ class AccountResourceIT extends BaseWebIntegrationTest {
         userAccountRepository.saveAndFlush(user);
 
         KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
-        keyAndPassword.setResetKey(user.getResetKey());
+        keyAndPassword.setKey(user.getResetKey());
         keyAndPassword.setNewPassword("new password");
 
         this.mockMvc
@@ -455,7 +458,7 @@ class AccountResourceIT extends BaseWebIntegrationTest {
         userAccountRepository.saveAndFlush(user);
 
         KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
-        keyAndPassword.setResetKey(user.getResetKey());
+        keyAndPassword.setKey(user.getResetKey());
         keyAndPassword.setNewPassword("foo");
 
         this.mockMvc
@@ -475,14 +478,15 @@ class AccountResourceIT extends BaseWebIntegrationTest {
     @Transactional
     void testFinishPasswordResetWrongKey() throws Exception {
         KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
-        keyAndPassword.setResetKey("wrong reset key");
+        keyAndPassword.setKey("wrong reset key");
         keyAndPassword.setNewPassword("new password");
 
         this.mockMvc
-                .perform(post("/api/account/reset-password/finish")
+                .perform(
+                        post("/api/account/reset-password/finish")
                                 .contentType(APPLICATION_JSON)
                                 .content(toJSON(keyAndPassword))
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isInternalServerError());
     }
 }

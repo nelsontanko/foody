@@ -1,12 +1,14 @@
 package dev.account.web;
 
 import dev.account.dto.*;
+import dev.account.user.User;
 import dev.account.user.UserAccountService;
 import dev.account.web.errors.AccountResourceException;
 import dev.account.web.errors.InvalidPasswordException;
 import dev.account.web.vm.KeyAndPasswordVM;
 import dev.account.web.vm.ManagedUserVM;
 import dev.security.SecurityUtils;
+import dev.services.common.MailService;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,11 +34,14 @@ import static org.springframework.http.HttpStatus.OK;
 public class AccountResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountResource.class);
+    private static final String MESSAGE_KEY = "message";
 
     private final UserAccountService userAccountService;
+    private final MailService mailService;
 
-    public AccountResource(UserAccountService userAccountService) {
+    public AccountResource(UserAccountService userAccountService, MailService mailService) {
         this.userAccountService = userAccountService;
+        this.mailService = mailService;
     }
 
     @PostMapping("/register")
@@ -44,8 +49,24 @@ public class AccountResource {
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        userAccountService.register(managedUserVM, managedUserVM.getPassword());
-        return new ResponseEntity<>(Collections.singletonMap("message", "Registration successful"), HttpStatus.CREATED);
+        User newUser = userAccountService.register(managedUserVM, managedUserVM.getPassword());
+        mailService.sendActivationEmail(newUser);
+        return new ResponseEntity<>(Collections.singletonMap(
+                MESSAGE_KEY, "Registration successful, please check email to confirm your account"), HttpStatus.CREATED);
+    }
+
+    /**
+     * {@code GET  /activate} : activate the registered user.
+     *
+     * @param key the activation key.
+     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be activated.
+     */
+    @PostMapping("/activate")
+    public void activateAccount(@RequestParam(value = "key") String key) {
+        Optional<User> user = userAccountService.activateAccount(key);
+        if (user.isEmpty()) {
+            throw new AccountResourceException("No user was found for this activation key");
+        }
     }
 
     /**
@@ -63,7 +84,7 @@ public class AccountResource {
                 .orElseThrow(() -> new AccountResourceException("Current user login not found"));
 
         userAccountService.updateUser(currentUserEmail, userUpdateDTO);
-        return ResponseEntity.ok(Collections.singletonMap("message", "Information updated successfully"));
+        return ResponseEntity.ok(Collections.singletonMap(MESSAGE_KEY, "Information updated successfully"));
     }
 
     @PostMapping("/change-password")
@@ -72,32 +93,43 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         userAccountService.changePassword(passwordChangeDto.currentPassword(), passwordChangeDto.newPassword());
-        return ResponseEntity.ok(Collections.singletonMap("message", "Password changed successfully"));
+        return ResponseEntity.ok(Collections.singletonMap(MESSAGE_KEY, "Password changed successfully"));
     }
 
+    /**
+     * {@code POST   /account/reset-password/init} : Send an email to reset the password of the user.
+     *
+     * @param email the mail of the user.
+     */
     @PostMapping(path = "/reset-password/init")
-    public ResponseEntity<?> requestPasswordReset(@RequestBody ResetEmailDTO resetEmailDTO) {
-        Optional<String> resetKey = userAccountService.requestPasswordReset(resetEmailDTO.email());
-        if (resetKey.isPresent()) {
-            // This could be where email is sent, but I am not implementing email sending for this
-            LOG.info("Password reset key generated for {}", resetEmailDTO.email());
-            return ResponseEntity.ok(Collections.singletonMap("resetKey", resetKey.get()));
+    public void requestPasswordReset(@RequestBody String email) {
+        Optional<User> user = userAccountService.requestPasswordReset(email);
+        if (user.isPresent()) {
+            mailService.sendPasswordResetMail(user.orElseThrow());
         } else {
             // Pretend the request has been successful to prevent checking which emails really exist
             // but log that an invalid attempt has been made
             LOG.warn("Password reset requested for non existing email");
-            return ResponseEntity.ok("If your email exists, you will receive reset instructions.");
         }
     }
 
+    /**
+     * {@code POST   /account/reset-password/finish} : Finish to reset the password of the user.
+     *
+     * @param keyAndPassword the generated key and the new password.
+     * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
+     * @throws RuntimeException         {@code 500 (Internal Server Error)} if the password could not be reset.
+     */
     @PostMapping(path = "/reset-password/finish")
-    public ResponseEntity<?> finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+    public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
         if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }
-        String message = userAccountService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getResetKey());
+        Optional<User> user = userAccountService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
 
-        return ResponseEntity.ok(Collections.singletonMap("message", message));
+        if (user.isEmpty()) {
+            throw new AccountResourceException("No user was found for this reset key");
+        }
     }
 
     /**

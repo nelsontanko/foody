@@ -10,5 +10,7 @@ import lombok.Getter;
 @Getter
 class UserCreateConfig {
     private String password;
+    private boolean activated;
+    private boolean generateActivationKey;
     private boolean generateResetKey;
 }

@@ -4,7 +4,9 @@ import dev.account.dto.AdminUserDTO;
 import dev.account.dto.UserDTO;
 import dev.account.user.Authority;
 import dev.account.user.User;
+import dev.core.config.Constants;
 import org.mapstruct.*;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,12 +40,19 @@ public interface UserMapper {
     @Mapping(target = "authorities", source = "authorities", qualifiedByName = "authoritiesToStringSet")
     AdminUserDTO userToAdminUserDTO(User user);
 
+    @Mapping(target = "activated", ignore = true)
+    @Mapping(target = "langKey", defaultValue = Constants.DEFAULT_LANGUAGE)
     @Mapping(target = "authorities", source = "authorities", qualifiedByName = "stringSetToAuthorities")
     User toUser(AdminUserDTO userDTO);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "authorities", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUserFromDTO(AdminUserDTO userDTO, @MappingTarget User user);
+
+    @AfterMapping
+    default void setLangKey(AdminUserDTO dto, @MappingTarget User user) {
+        user.setLangKey(StringUtils.hasText(dto.getLangKey()) ? dto.getLangKey() : Constants.DEFAULT_LANGUAGE);
+    }
 
     @Named("authoritiesToStringSet")
     default Set<String> authoritiesToStringSet(Set<Authority> authorities) {

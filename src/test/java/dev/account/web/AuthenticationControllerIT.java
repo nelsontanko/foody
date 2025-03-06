@@ -31,6 +31,7 @@ class AuthenticationControllerIT extends BaseWebIntegrationTest {
     void testAuthorize() throws Exception {
         var user = new User();
         user.setEmail("user-jwt-controller@example.com");
+        user.setActivated(true);
         user.setPassword(passwordEncoder.encode("test"));
 
         userAccountRepository.saveAndFlush(user);
@@ -54,6 +55,7 @@ class AuthenticationControllerIT extends BaseWebIntegrationTest {
         var user = new User();
         user.setEmail("user-jwt-controller-remember-me@email.com");
         user.setPassword(passwordEncoder.encode("test"));
+        user.setActivated(true);
 
         userAccountRepository.saveAndFlush(user);
 

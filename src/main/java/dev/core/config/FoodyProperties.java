@@ -26,6 +26,7 @@ public class FoodyProperties {
     private final Logging logging = new Logging();
     private final Security security = new Security();
     private final Async async = new Async();
+    private final Mail mail = new Mail();
     private final ApiDocs apiDocs = new ApiDocs();
 
     public FoodyProperties() {
@@ -79,6 +80,16 @@ public class FoodyProperties {
             public Logstash() {
             }
         }
+    }
+
+    @Getter @Setter
+    public static class Mail {
+
+        private boolean enabled = FoodyDefaults.Mail.enabled;
+
+        private String from = FoodyDefaults.Mail.from;
+
+        private String baseUrl = FoodyDefaults.Mail.baseUrl;
     }
 
     public static class Security {
@@ -251,19 +262,13 @@ public class FoodyProperties {
     }
 
 
+    @Setter @Getter
     public static class ClientApp {
         private String name = "foodyApp";
 
         public ClientApp() {
         }
 
-        public String getName() {
-            return this.name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
     }
 
     @Getter @Setter

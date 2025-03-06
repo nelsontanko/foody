@@ -20,6 +20,15 @@ public final class RandomUtils {
     }
 
     /**
+     * Generate an activation key.
+     *
+     * @return the generated activation key.
+     */
+    public static String generateActivationKey() {
+        return generateRandomNumericString();
+    }
+
+    /**
      * <p>generateRandomNumericString. for OTP</p>
      *
      * @return a {@link String} object.

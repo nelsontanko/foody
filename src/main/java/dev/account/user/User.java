@@ -52,6 +52,17 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(length = 100, unique = true, nullable = false)
     private String email;
 
+    @NotNull
+    @Column(nullable = false)
+    private boolean activated;
+
+    @Size(max = 20)
+    @JsonIgnore
+    private String activationKey;
+
+    @Size(min = 2, max = 10)
+    private String langKey;
+
     @Size(max = 20)
     @JsonIgnore
     private String resetKey;
@@ -77,17 +88,17 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @PrePersist
     protected void onCreate() {
-        this.status = UserStatus.ACTIVE;
+        this.status = UserStatus.INACTIVE;
     }
 
     @Override public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(password, user.password) && Objects.equals(fullname, user.fullname) && Objects.equals(email, user.email) && Objects.equals(resetKey, user.resetKey) && Objects.equals(resetDate, user.resetDate) && status == user.status && Objects.equals(addresses, user.addresses) && Objects.equals(authorities, user.authorities);
+        return activated == user.activated && Objects.equals(id, user.id) && Objects.equals(password, user.password) && Objects.equals(fullname, user.fullname) && Objects.equals(email, user.email) && Objects.equals(activationKey, user.activationKey) && Objects.equals(langKey, user.langKey) && Objects.equals(resetKey, user.resetKey) && Objects.equals(resetDate, user.resetDate) && status == user.status && Objects.equals(addresses, user.addresses) && Objects.equals(authorities, user.authorities);
     }
 
     @Override public int hashCode() {
-        return Objects.hash(id, password, fullname, email, resetKey, resetDate, status, addresses, authorities);
+        return Objects.hash(id, password, fullname, email, activated, activationKey, langKey, resetKey, resetDate, status, addresses, authorities);
     }
 
     @Override public String toString() {
@@ -96,10 +107,9 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
                 ", password='" + password + '\'' +
                 ", fullname='" + fullname + '\'' +
                 ", email='" + email + '\'' +
-                ", resetKey='" + resetKey + '\'' +
-                ", resetDate=" + resetDate +
+                ", activated=" + activated +
+                ", langKey='" + langKey + '\'' +
                 ", status=" + status +
-                ", addresses=" + addresses +
                 ", authorities=" + authorities +
                 '}';
     }

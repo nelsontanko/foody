@@ -8,6 +8,10 @@ spring:
   jackson:
     serialization:
       write-durations-as-timestamps: false
+  mail:
+    host: localhost
+  messages:
+    basename: i18n/messages
   main:
     allow-bean-definition-overriding: true
   security:
@@ -27,6 +31,8 @@ spring:
       thread-name-prefix: venda-scheduling-
       pool:
         size: 20
+  thymeleaf:
+    mode: HTML
 
 server:
   port: 10344
@@ -35,6 +41,9 @@ server:
 foody:
   clientApp:
     name: 'foodyApp'
+  mail:
+    from: foody@localhost.com
+    base-url: http://127.0.0.1:8080
   logging:
     # To test json console appender
     use-json-format: false
@@ -52,3 +61,7 @@ foody:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 86400
 
+management:
+  health:
+    mail:
+      enabled: false

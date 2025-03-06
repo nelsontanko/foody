@@ -31,9 +31,9 @@ public class UserBuilder {
         return this;
     }
 
-    public UserBuilder withResetDetails(LocalDateTime resetDate, String resetKey) {
-        user.setResetDate(resetDate);
-        user.setResetKey(resetKey);
+    public UserBuilder withActivationDetails(boolean activated, String activationKey) {
+        user.setActivated(activated);
+        user.setActivationKey(activationKey);
         return this;
     }
 

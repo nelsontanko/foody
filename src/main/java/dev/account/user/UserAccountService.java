@@ -45,20 +45,39 @@ public class UserAccountService {
         this.userMapper = userMapper;
     }
 
-    public void register(AdminUserDTO userDTO, String password){
+    public User register(AdminUserDTO userDTO, String password){
         User newUser = createUser(userDTO, UserCreateConfig.builder()
                 .password(password)
+                .activated(false)
+                .generateActivationKey(true)
                 .build());
         assignAuthorities(newUser);
 
         userAccountRepository.save(newUser);
         this.clearUserCaches(newUser);
         LOG.debug("User Creation successful: {}", newUser.getEmail());
+        return newUser;
+    }
+
+    public Optional<User> activateAccount(String activationKey){
+        LOG.debug("Activating user for activation key {}", activationKey);
+        return userAccountRepository.findOneByActivationKey(activationKey)
+                .map(user -> {
+                    user.setActivated(true);
+                    user.setActivationKey(null);
+                    user.setStatus(UserStatus.ACTIVE);
+
+                    LOG.debug("Activated user: {}", user);
+                    this.clearUserCaches(user);
+                    return user;
+                });
     }
 
     public void createUser(AdminUserDTO userDTO) {
         User newUser = createUser(userDTO, UserCreateConfig.builder()
                 .password(RandomUtils.generatePassword())
+                .activated(true)
+                .generateResetKey(true)
                 .build());
 
         if (userDTO.getAuthorities() != null) {
@@ -107,44 +126,31 @@ public class UserAccountService {
                 });
     }
 
-    public Optional<String> requestPasswordReset(String email) {
+    public Optional<User> requestPasswordReset(String email) {
         LOG.info("Looking for user with email: {}", email);
         return userAccountRepository
                 .findOneByEmailIgnoreCase(email)
+                .filter(User::isActivated)
                 .map(user -> {
-                    String resetKey = RandomUtils.generateResetKey();
-                    user.setResetKey(resetKey);
+                    user.setResetKey(RandomUtils.generateResetKey());
                     user.setResetDate(LocalDateTime.now());
                     this.clearUserCaches(user);
-                    userAccountRepository.save(user);
-                    return resetKey;
+                    return user;
                 });
     }
 
-    public String completePasswordReset(String newPassword, String key) {
+    public Optional<User> completePasswordReset(String newPassword, String key) {
         LOG.debug("Reset user password for reset key {}", key);
-
-        Optional<User> userOptional = userAccountRepository.findOneByResetKey(key);
-
-        if (userOptional.isEmpty()) {
-            LOG.warn("Password reset failed: Invalid reset key {}", key);
-            return "Invalid reset key";
-        }
-
-        User user = userOptional.get();
-        if (user.getResetDate() == null || user.getResetDate().isBefore(LocalDateTime.now().minusHours(10))) {
-            LOG.warn("Password reset failed: Reset key {} has expired", key);
-            return "Reset key has expired";
-        }
-
-        user.setPassword(passwordEncoder.encode(newPassword));
-        user.setResetKey(null);
-        user.setResetDate(null);
-        userAccountRepository.save(user);
-        this.clearUserCaches(user);
-
-        LOG.info("Password reset successful for user {}", user.getEmail());
-        return "Password reset successful";
+        return userAccountRepository
+                .findOneByResetKey(key)
+                .filter(user -> user.getResetDate().isAfter(LocalDateTime.now().minusDays(1)))
+                .map(user -> {
+                    user.setPassword(passwordEncoder.encode(newPassword));
+                    user.setResetKey(null);
+                    user.setResetDate(null);
+                    this.clearUserCaches(user);
+                    return user;
+                });
     }
 
     @Transactional(readOnly = true)
@@ -153,11 +159,20 @@ public class UserAccountService {
                 .flatMap(userAccountRepository::findOneWithAuthoritiesByEmailIgnoreCase);
     }
 
-    @Scheduled(cron = "0 0 */10 * * *") // Runs every 10 hours
-    public void removeExpiredResetKeys() {
-        LocalDateTime expirationTime = LocalDateTime.now().minusHours(10);
-        int deletedCount = userAccountRepository.removeExpiredResetKeys(expirationTime);
-        LOG.debug("Cleanup executed: {} reset keys removed.", deletedCount);
+    /**
+     * Not activated users should be automatically deleted after 3 days.
+     * <p>
+     * This is scheduled to get fired every day, at 01:00 (am).
+     */
+    @Scheduled(cron = "0 0 1 * * ?")
+    public void removeNotActivatedUsers() {
+        userAccountRepository
+                .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(LocalDateTime.now().minusDays(3))
+                .forEach(user -> {
+                    LOG.debug("Deleting not activated user {}", user.getEmail());
+                    userAccountRepository.delete(user);
+                    this.clearUserCaches(user);
+                });
     }
 
     private User createUser(AdminUserDTO userDTO, UserCreateConfig config) {
@@ -167,6 +182,8 @@ public class UserAccountService {
                 .withBaseUser(userMapper.toUser(userDTO))
                 .withEmail(userDTO.getEmail().toLowerCase())
                 .withPassword(passwordEncoder.encode(config.getPassword()))
+                .withActivationDetails(config.isActivated(), config.isGenerateActivationKey() ?
+                        RandomUtils.generateActivationKey() : null)
                 .build();
     }
 
