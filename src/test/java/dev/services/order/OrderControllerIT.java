@@ -12,13 +12,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.*;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 
+import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,8 +36,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Nelson Tanko
  */
-@Disabled(value = "Tests run in isolation (individually), a little tweak will be needed to make them run together")
+//@Disabled(value = "Tests run in isolation (individually), a little tweak will be needed to make them run together")
 class OrderControllerIT extends BaseWebIntegrationTest {
+
+//    @LocalServerPort
+//    private int port;
 
     @Autowired TestDataHelper testDataHelper;
     @Autowired OrderRepository orderRepository;
@@ -250,5 +261,39 @@ class OrderControllerIT extends BaseWebIntegrationTest {
     }
 
 
+//    @Test
+//    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
+//    void testOrderStatusUpdateWebSocket() throws Exception {
+//        WebSocketStompClient stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+//        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+//
+//        CompletableFuture<OrderStatusUpdateDTO> future = new CompletableFuture<>();
+//
+//        StompSession session = stompClient.connectAsync("ws://localhost:" + port + "/ws", new StompSessionHandlerAdapter() {})
+//                .get(5, TimeUnit.SECONDS);
+//
+//        session.subscribe("/topic/order-tracking/1", new StompFrameHandler() {
+//            @Override
+//            public Type getPayloadType(StompHeaders headers) {
+//                return OrderStatusUpdateDTO.class;
+//            }
+//
+//            @Override
+//            public void handleFrame(StompHeaders headers, Object payload) {
+//                future.complete((OrderStatusUpdateDTO) payload);
+//            }
+//        });
+//
+//        OrderStatusUpdateDTO updateRequest = new OrderStatusUpdateDTO();
+//        updateRequest.setOrderId(1L);
+//        updateRequest.setOrderStatus(OrderStatus.DELIVERING);
+//
+//        session.send("/api/order/app/update-order-status", updateRequest);
+//
+//        OrderStatusUpdateDTO response = future.get(5, TimeUnit.SECONDS);
+//
+//        assertThat(response.getOrderId()).isEqualTo(1L);
+//        assertThat(response.getOrderStatus()).isEqualTo(OrderStatus.DELIVERING);
+//    }
 
 }

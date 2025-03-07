@@ -154,9 +154,9 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(3))
-                .andExpect(jsonPath("$.content[0].name").value("Tasty Bites"))
+                .andExpect(jsonPath("$.content[0].name").value("Gummy Bites"))
                 .andExpect(jsonPath("$.content[1].name").value("Frosty Bites"))
-                .andExpect(jsonPath("$.content[2].name").value("Gummy Bites"));
+                .andExpect(jsonPath("$.content[2].name").value("Tasty Bites"));
     }
 
     @Test

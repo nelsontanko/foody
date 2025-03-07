@@ -1,4 +1,4 @@
-package dev.services.rating.core.config;
+package dev.core.config;
 
 import dev.FoodyWebIntegrationTest;
 import org.junit.jupiter.api.ClassDescriptor;

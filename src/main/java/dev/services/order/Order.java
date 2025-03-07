@@ -3,6 +3,7 @@ package dev.services.order;
 import dev.account.user.Address;
 import dev.account.user.User;
 import dev.core.common.AbstractAuditingEntity;
+import dev.core.exception.GenericApiException;
 import dev.services.restaurant.Restaurant;
 import jakarta.persistence.*;
 import lombok.*;
@@ -54,4 +55,11 @@ public class Order extends AbstractAuditingEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "delivery_address_id", nullable = false)
     private Address deliveryAddress;
+
+//    public void updateStatus(OrderStatus newStatus) {
+//        if (this.status == OrderStatus.DELIVERED) {
+//            throw new GenericApiException("Cannot update a delivered order.");
+//        }
+//        this.status = newStatus;
+//    }
 }

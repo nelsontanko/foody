@@ -1,4 +1,4 @@
-package dev.services.rating.core.config;
+package dev.core.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

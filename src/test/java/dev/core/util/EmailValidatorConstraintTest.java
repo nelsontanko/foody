@@ -1,4 +1,4 @@
-package dev.services.rating.core.util;
+package dev.core.util;
 
 import dev.core.validation.EmailConstraintValidator;
 import org.junit.jupiter.api.BeforeEach;

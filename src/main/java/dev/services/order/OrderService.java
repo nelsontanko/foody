@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,19 +38,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final FoodRepository foodRepository;
     private final RestaurantRepository restaurantRepository;
-    private final UserAccountRepository userAccountRepository;
+    private final SimpMessagingTemplate messagingTemplate;
     private final AddressRepository addressRepository;
     private final OrderMapper orderMapper;
     private final OrderCompletionService orderCompletionService;
     private final AuthenticatedUser auth;
     private final TaskScheduler taskScheduler;
 
-    public OrderService(OrderRepository orderRepository, FoodRepository foodRepository, RestaurantRepository restaurantRepository, UserAccountRepository userAccountRepository,
+    public OrderService(OrderRepository orderRepository, FoodRepository foodRepository, RestaurantRepository restaurantRepository, SimpMessagingTemplate messagingTemplate,
                         AddressRepository addressRepository, OrderMapper orderMapper, OrderCompletionService orderCompletionService, AuthenticatedUser auth, TaskScheduler taskScheduler) {
         this.orderRepository = orderRepository;
         this.foodRepository = foodRepository;
         this.restaurantRepository = restaurantRepository;
-        this.userAccountRepository = userAccountRepository;
+        this.messagingTemplate = messagingTemplate;
         this.addressRepository = addressRepository;
         this.orderMapper = orderMapper;
         this.orderCompletionService = orderCompletionService;
@@ -82,6 +83,20 @@ public class OrderService {
         Page<Order> orders = orderRepository.findAllByUserOrderByOrderTimeDesc(user, pageable);
 
         return orders.map(orderMapper::toDto);
+    }
+
+    public Response updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() ->
+                new GenericApiException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (order.getStatus().equals(OrderStatus.DELIVERED)){
+            throw new GenericApiException("Cannot update a delivered order.");
+        }
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+
+        messagingTemplate.convertAndSend("/topic/order-tracking/" + orderId, newStatus);
+        return orderMapper.toDto(order);
     }
 
     private Address resolveDeliveryAddress(User user, AddressDTO.Request address) {

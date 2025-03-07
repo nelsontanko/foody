@@ -1,23 +1,23 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: foody-app
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foody'
-      - 'SPRING_DATASOURCE_USERNAME=postgres'
-      - 'SPRING_DATASOURCE_PASSWORD=secret'
-    ports:
-      - "8080:8080"
-    networks:
-      - foody-postgres-net
-    restart: unless-stopped
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: foody-app
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    environment:
+#      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/foody'
+#      - 'SPRING_DATASOURCE_USERNAME=postgres'
+#      - 'SPRING_DATASOURCE_PASSWORD=secret'
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - foody-postgres-net
+#    restart: unless-stopped
 
   postgres:
     image: 'postgres:16-alpine'
@@ -40,6 +40,13 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+  redis:
+    container_name: foody-redis
+    image: 'redis:7.4'
+    ports:
+      - '6379:6379'
+    networks:
+      - foody-postgres-net
 
 networks:
   foody-postgres-net:
