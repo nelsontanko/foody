@@ -6,6 +6,7 @@ import dev.services.restaurant.RestaurantDTO.UpdateRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,8 @@ public class RestaurantController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Response>> getAllRestaurants(@PageableDefault final Pageable pageable) {
+    public ResponseEntity<Page<Response>> getAllRestaurants(@PageableDefault(
+            sort = {"createdDate"}, direction = Sort.Direction.DESC) final Pageable pageable) {
         return ResponseEntity.ok(restaurantService.getAllRestaurants(pageable));
     }
 

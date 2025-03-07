@@ -1,4 +1,4 @@
-package dev.core.config;
+package dev.services.rating.core.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

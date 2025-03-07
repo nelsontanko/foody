@@ -1,4 +1,4 @@
-package dev.core.config;
+package dev.services.rating.core.config;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;

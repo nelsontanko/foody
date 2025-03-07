@@ -4,12 +4,16 @@ import dev.account.user.AddressMapper;
 import dev.account.user.AddressRepository;
 import dev.core.exception.ErrorCode;
 import dev.core.exception.GenericApiException;
+import dev.services.common.CacheService;
 import dev.services.restaurant.RestaurantDTO.Request;
 import dev.services.restaurant.RestaurantDTO.Response;
 import dev.services.restaurant.RestaurantDTO.UpdateRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,20 +28,22 @@ import static dev.core.exception.ErrorCode.RESTAURANT_NOT_FOUND;
  */
 @Service
 public class RestaurantService {
+    private static final String CACHE_NAME = "restaurants";
+
     private static final Logger LOG = LoggerFactory.getLogger(RestaurantService.class);
 
     private final RestaurantRepository restaurantRepository;
     private final AddressRepository addressRepository;
     private final RestaurantMapper restaurantMapper;
     private final CourierMapper courierMapper;
-    private final AddressMapper addressMapper;
+    private final CacheService cacheService;
 
-    public RestaurantService(RestaurantRepository restaurantRepository, AddressRepository addressRepository, RestaurantMapper restaurantMapper, CourierMapper courierMapper, AddressMapper addressMapper) {
+    public RestaurantService(RestaurantRepository restaurantRepository, AddressRepository addressRepository, RestaurantMapper restaurantMapper, CourierMapper courierMapper, CacheService cacheService) {
         this.restaurantRepository = restaurantRepository;
         this.addressRepository = addressRepository;
         this.restaurantMapper = restaurantMapper;
         this.courierMapper = courierMapper;
-        this.addressMapper = addressMapper;
+        this.cacheService = cacheService;
     }
 
     @Transactional
@@ -52,10 +58,12 @@ public class RestaurantService {
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
         LOG.info("Restaurant created with ID: {}", savedRestaurant.getId());
+        cacheService.evictAllCacheEntries(CACHE_NAME);
         return restaurantMapper.toResponseDto(savedRestaurant);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME)
     public Page<Response> getAllRestaurants(Pageable pageable) {
         LOG.info("Fetching all active restaurants");
         Page<Restaurant> restaurants = restaurantRepository.findByActiveTrueOrderByAvailableDesc(pageable);
@@ -63,6 +71,7 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME)
     public Response getRestaurantById(Long restaurantId) {
         LOG.info("Fetching restaurant with ID: {}", restaurantId);
         Restaurant restaurant = findRestaurantById(restaurantId);
@@ -78,6 +87,7 @@ public class RestaurantService {
         updateCourier(request.getCourier(), restaurant);
 
         Restaurant updatedRestaurant = restaurantRepository.save(restaurant);
+        cacheService.evictAllCacheEntries(CACHE_NAME);
         LOG.info("Restaurant updated: {}", updatedRestaurant.getId());
         return restaurantMapper.toResponseDto(updatedRestaurant);
     }
@@ -93,6 +103,7 @@ public class RestaurantService {
             restaurant.getCourier().setActive(false);
         }
         restaurantRepository.save(restaurant);
+        cacheService.evictAllCacheEntries(CACHE_NAME);
         LOG.info("Restaurant soft deleted: {}", restaurantId);
     }
 
