@@ -25,6 +25,7 @@ help:
 	@echo "  make docker-compose-up  - Start all services with Docker Compose"
 	@echo "  make docker-compose-down - Stop all services with Docker Compose"
 	@echo "  make db-connect         - Connect to PostgreSQL database"
+	@echo "  make redis              - Connect to Redis"
 	@echo "  make version            - Set version number for the build (make version VERSION=1.2.3)"
 
 build:
@@ -68,6 +69,9 @@ docker-compose-down:
 
 db-connect:
 	docker exec -it foody-db psql -U postgres -d foody
+
+redis:
+	docker exec -it foody-redis bash
 
 version:
 	@echo "Building version: $(VERSION)"
