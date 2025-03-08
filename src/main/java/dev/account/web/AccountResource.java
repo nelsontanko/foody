@@ -1,6 +1,8 @@
 package dev.account.web;
 
-import dev.account.dto.*;
+import dev.account.dto.AdminUserDTO;
+import dev.account.dto.PasswordChangeDTO;
+import dev.account.dto.UserUpdateDTO;
 import dev.account.user.User;
 import dev.account.user.UserAccountService;
 import dev.account.web.errors.AccountResourceException;

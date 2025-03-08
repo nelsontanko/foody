@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 public interface UserAccountRepository extends JpaRepository<User, Long> {
 
-    String USERS_BY_EMAIL_CACHE = "usersByEmail";
+    String USERS_BY_EMAIL_CACHE = "caffeine_usersByEmail";
 
     Optional<User> findOneByEmailIgnoreCase(String email);
 

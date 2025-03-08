@@ -31,6 +31,7 @@ spring:
       hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
       hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: false # TODO
+      hibernate.javax.cache.missing_cache_strategy: create
       hibernate.cache.use_second_level_cache: true
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
@@ -58,6 +59,13 @@ spring:
   redis:
     host: localhost
     port: 6379
+    database: 0
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
   task:
     execution:
       thread-name-prefix: foody-task-
@@ -91,6 +99,10 @@ error:
     full-stacktrace-http-statuses: 5xx
     log-levels:
       5xx: ERROR
+
+local:
+  server:
+    port: 8080
 
 foody:
   clientApp:

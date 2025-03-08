@@ -18,11 +18,12 @@ public enum ErrorCode {
     // User
     USER_NOT_FOUND("api.user.notFound", HttpStatus.NOT_FOUND),
     USER_NOT_LOGGED_IN("api.user.notLoggedIn", HttpStatus.BAD_REQUEST),
-    USER_ADDRESS_NOT_FOUND("api.user.addressNotFound", HttpStatus.BAD_REQUEST),
+    USER_ADDRESS_NOT_FOUND("api.user.addressNotFound", HttpStatus.NOT_FOUND),
 
     // Oder
     ORDER_NOT_FOUND("api.order.notFound", HttpStatus.NOT_FOUND),
     ORDER_CANNOT_BE_CANCELED("api.order.cannotBeCanceled", HttpStatus.CONFLICT),
+    ORDER_ALREADY_DELIVERED( "api.order.alreadyDelivered", HttpStatus.BAD_REQUEST),
 
     // Restaurant
     RESTAURANT_NOT_FOUND("api.restaurant.notFound", HttpStatus.NOT_FOUND),
