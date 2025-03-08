@@ -35,7 +35,6 @@ public class AsyncConfiguration implements AsyncConfigurer {
     @Override
     @Bean(name = "taskExecutor")
     public Executor getAsyncExecutor() {
-        LOG.debug("Creating Async Task Executor");
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(taskExecutionProperties.getPool().getCoreSize());
         executor.setMaxPoolSize(taskExecutionProperties.getPool().getMaxSize());
@@ -46,7 +45,6 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     @Bean(name = "taskScheduler")
     public TaskScheduler taskScheduler() {
-        LOG.debug("Creating Task Scheduler with shared task execution properties");
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 
         scheduler.setPoolSize(taskExecutionProperties.getPool().getMaxSize());
