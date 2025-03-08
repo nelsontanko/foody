@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -37,9 +35,8 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getUserOrders(pageable));
     }
 
-    @MessageMapping("/update-order-status")
-    @SendTo("/topic/order-tracking")
-    public ResponseEntity<Response> updateOrderStatus(OrderStatusUpdateDTO statusUpdateDTO) {
+    @PatchMapping("/status")
+    public ResponseEntity<Response> updateOrderStatus(@RequestBody OrderStatusUpdateRequest statusUpdateDTO) {
         Response response = orderService.updateOrderStatus(statusUpdateDTO.getOrderId(), statusUpdateDTO.getOrderStatus());
         return ResponseEntity.ok(response);
     }

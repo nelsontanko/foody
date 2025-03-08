@@ -35,7 +35,7 @@ public class OrderDTO {
     public static class Response {
         private Long id;
         private Long userId;
-        private String userName;
+        private String username;
         private Long restaurantId;
         private String restaurantName;
         private List<OrderItemDTO.Response> orderItems;

@@ -8,6 +8,7 @@ import dev.services.food.FoodRepository;
 import dev.services.order.OrderDTO.Request;
 import dev.services.order.OrderDTO.Response;
 import dev.services.restaurant.Restaurant;
+import dev.services.restaurant.RestaurantAvailabilityService;
 import dev.services.restaurant.RestaurantRepository;
 import dev.services.util.AuthenticatedUser;
 import org.slf4j.Logger;
@@ -15,14 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -38,29 +36,25 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final FoodRepository foodRepository;
     private final RestaurantRepository restaurantRepository;
-    private final SimpMessagingTemplate messagingTemplate;
     private final AddressRepository addressRepository;
     private final OrderMapper orderMapper;
-    private final OrderCompletionService orderCompletionService;
+    private final RestaurantAvailabilityService restaurantAvailabilityService;
     private final AuthenticatedUser auth;
-    private final TaskScheduler taskScheduler;
 
-    public OrderService(OrderRepository orderRepository, FoodRepository foodRepository, RestaurantRepository restaurantRepository, SimpMessagingTemplate messagingTemplate,
-                        AddressRepository addressRepository, OrderMapper orderMapper, OrderCompletionService orderCompletionService, AuthenticatedUser auth, TaskScheduler taskScheduler) {
+    public OrderService(OrderRepository orderRepository, FoodRepository foodRepository, RestaurantRepository restaurantRepository,
+                        AddressRepository addressRepository, OrderMapper orderMapper, RestaurantAvailabilityService restaurantAvailabilityService, AuthenticatedUser auth) {
         this.orderRepository = orderRepository;
         this.foodRepository = foodRepository;
         this.restaurantRepository = restaurantRepository;
-        this.messagingTemplate = messagingTemplate;
         this.addressRepository = addressRepository;
         this.orderMapper = orderMapper;
-        this.orderCompletionService = orderCompletionService;
+        this.restaurantAvailabilityService = restaurantAvailabilityService;
         this.auth = auth;
-        this.taskScheduler = taskScheduler;
     }
 
     @Transactional
     public Response createOrder(Request request) {
-        var user = auth.getAuthenticatedUser();
+        User user = auth.getAuthenticatedUser();
 
         Address deliveryAddress = resolveDeliveryAddress(user, request.getDeliveryAddress());
         Restaurant restaurant = findAvailableRestaurant(deliveryAddress);
@@ -70,8 +64,8 @@ public class OrderService {
 
         Order order = createNewOrder(user, restaurant, deliveryAddress, orderItems, totalAmount);
 
+        restaurantAvailabilityService.markRestaurantAsBusy(restaurant.getId(), order.getId(), order.getEstimatedDeliveryTime());
         markRestaurantAndCourierAsBusy(restaurant);
-        scheduleOrderCompletion(order.getId(), restaurant.getId(), order.getEstimatedDeliveryTime());
 
         LOG.info("Order created successfully with id: {}", order.getId());
         return orderMapper.toDto(order);
@@ -90,12 +84,11 @@ public class OrderService {
                 new GenericApiException(ErrorCode.ORDER_NOT_FOUND));
 
         if (order.getStatus().equals(OrderStatus.DELIVERED)){
-            throw new GenericApiException("Cannot update a delivered order.");
+            throw new GenericApiException(ErrorCode.ORDER_ALREADY_DELIVERED);
         }
         order.setStatus(newStatus);
         orderRepository.save(order);
 
-        messagingTemplate.convertAndSend("/topic/order-tracking/" + orderId, newStatus);
         return orderMapper.toDto(order);
     }
 
@@ -184,18 +177,6 @@ public class OrderService {
                 .filter(r -> r.getAddress() != null)
                 .min(Comparator.comparingDouble(r -> r.getAddress().distanceTo(deliveryLocation)))
                 .orElseThrow(() -> new GenericApiException(ErrorCode.RESTAURANT_NOT_FOUND));
-    }
-
-    private void scheduleOrderCompletion(Long orderId, Long restaurantId, LocalDateTime deliveryTime) {
-        Instant scheduledTime = deliveryTime.atZone(ZoneId.systemDefault()).toInstant();
-
-        taskScheduler.schedule(() -> {
-            try {
-                orderCompletionService.completeOrderAndFreeRestaurant(orderId, restaurantId);
-            } catch (Exception e) {
-                LOG.error("Error completing order: {}", e.getMessage(), e);
-            }
-        }, scheduledTime);
     }
 
     private Address createAndSaveNewAddress(User user, AddressDTO.Request request) {

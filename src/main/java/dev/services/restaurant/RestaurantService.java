@@ -1,6 +1,5 @@
 package dev.services.restaurant;
 
-import dev.account.user.AddressMapper;
 import dev.account.user.AddressRepository;
 import dev.core.exception.ErrorCode;
 import dev.core.exception.GenericApiException;
@@ -11,8 +10,6 @@ import dev.services.restaurant.RestaurantDTO.UpdateRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

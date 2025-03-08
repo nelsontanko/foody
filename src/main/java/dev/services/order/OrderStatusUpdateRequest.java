@@ -1,12 +1,14 @@
 package dev.services.order;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * @author Nelson Tanko
  */
 @Data
-public class OrderStatusUpdateDTO {
+@AllArgsConstructor
+public class OrderStatusUpdateRequest {
     private Long orderId;
     private OrderStatus orderStatus;
 }

@@ -13,7 +13,7 @@ import java.util.List;
 public interface OrderMapper {
 
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "userName", source = "user.fullname")
+    @Mapping(target = "username", source = "user.fullname")
     @Mapping(target = "restaurantId", source = "restaurant.id")
     @Mapping(target = "restaurantName", source = "restaurant.name")
     @Mapping(target = "deliveryAddress", source = "deliveryAddress")
