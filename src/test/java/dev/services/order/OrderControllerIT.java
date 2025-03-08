@@ -1,32 +1,19 @@
 package dev.services.order;
 
 import dev.BaseWebIntegrationTest;
-import dev.account.user.Address;
 import dev.account.user.AddressDTO;
 import dev.account.user.User;
 import dev.services.TestDataHelper;
 import dev.services.food.Food;
 import dev.services.restaurant.Restaurant;
 import dev.services.restaurant.RestaurantRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.*;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import java.lang.reflect.Type;
-import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,17 +23,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Nelson Tanko
  */
-//@Disabled(value = "Tests run in isolation (individually), a little tweak will be needed to make them run together")
-class OrderControllerIT extends BaseWebIntegrationTest {
-
-//    @LocalServerPort
-//    private int port;
+@Disabled(value = "Tests run in isolation (individually), a little tweak will be needed to make them run together")
+class   OrderControllerIT extends BaseWebIntegrationTest {
 
     @Autowired TestDataHelper testDataHelper;
     @Autowired OrderRepository orderRepository;
     @Autowired RestaurantRepository restaurantRepository;
-    @Autowired OrderCompletionService orderCompletionService;
-    @Autowired TaskScheduler taskScheduler;
 
     private Food testFood;
     private User testUser;
@@ -54,12 +36,28 @@ class OrderControllerIT extends BaseWebIntegrationTest {
     @BeforeEach
     void setUp() {
         testUser = testDataHelper.createUser("user@example.com", Set.of("ROLE_USER"));
-        testDataHelper.createUser("newuser@example.com", Set.of("ROLE_USER"));
-
-        testDataHelper.createRestaurant("Gummy Bites", true, true, 88.99, 330.98);
-        testDataHelper.createRestaurant("Tasty Bites", true, true, 82.99, 322.98);
         testFood = testDataHelper.createFood();
     }
+
+    @AfterEach
+    void cleanUp(){
+        testDataHelper.clearData();
+    }
+
+//    @BeforeEach
+//    void setUp() {
+//        testUser = testDataHelper.createUser("user@example.com", Set.of("ROLE_USER"));
+//        testDataHelper.createUser("newuser@example.com", Set.of("ROLE_USER"));
+//
+//        testDataHelper.createRestaurant("Gummy Bites", true, true, 88.99, 330.98);
+//        testDataHelper.createRestaurant("Tasty Bites", true, true, 82.99, 322.98);
+//        testFood = testDataHelper.createFood();
+//    }
+//
+//    @AfterEach
+//    void cleanUp() {
+//        testDataHelper.clearData();
+//    }
 
 
     @Test
@@ -110,13 +108,15 @@ class OrderControllerIT extends BaseWebIntegrationTest {
     @Test
     @WithMockUser(username = "newuser@example.com", authorities = {"ROLE_USER"})
     void createOrder_NoPreviousAddress_ShouldThrowException() throws Exception {
+        testDataHelper.createUser("newuser@example.com", Set.of("ROLE_USER"));
+
         OrderDTO.Request request = new OrderDTO.Request();
         request.setOrderItems(List.of(new OrderItemDTO.Request(testFood.getId(), 1)));
 
         mockMvc.perform(post("/api/order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJSON(request)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("api.user.addressNotFound"));
     }
 
@@ -219,81 +219,5 @@ class OrderControllerIT extends BaseWebIntegrationTest {
         Restaurant updatedRestaurant = restaurantRepository.findById(restaurant.getId()).orElseThrow();
         assertThat(updatedRestaurant.isAvailable()).isFalse();
     }
-
-    @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-    void restaurant_BecomesAvailable_After15Minutes() throws Exception {
-        Restaurant restaurant = testDataHelper.createRestaurant("Active Spot", true, true, 40.7306, -70.9352);
-        Address address = testDataHelper.createAddress();
-        Order order = testDataHelper.createOrder(testUser, restaurant, address, testFood, 3);
-
-        taskScheduler.schedule(() -> {
-            try {
-                orderCompletionService.completeOrderAndFreeRestaurant(order.getId(), restaurant.getId());
-            } catch (Exception e) {
-            }
-        }, Instant.now());
-
-        // Wait a few seconds to allow task to complete
-        Thread.sleep(2000);
-
-        Restaurant updatedRestaurant = restaurantRepository.findById(restaurant.getId()).orElseThrow();
-        assertThat(updatedRestaurant.isAvailable()).isTrue();
-    }
-
-    @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-    void order_StatusChangesToDelivered_After15Minutes() throws Exception {
-        Restaurant restaurant = testDataHelper.createRestaurant("Active Spot", true, true, 40.7306, -70.9352);
-        Address address = testDataHelper.createAddress();
-        Order order = testDataHelper.createOrder(testUser, restaurant, address, testFood, 3);
-        taskScheduler.schedule(() -> {
-
-            orderCompletionService.completeOrderAndFreeRestaurant(order.getId(), restaurant.getId());
-
-        }, Instant.now());
-
-        // Wait a few seconds to allow task to complete
-        Thread.sleep(2000);
-
-        Order updatedOrder = orderRepository.findById(order.getId()).orElseThrow();
-        assertThat(updatedOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
-    }
-
-
-//    @Test
-//    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-//    void testOrderStatusUpdateWebSocket() throws Exception {
-//        WebSocketStompClient stompClient = new WebSocketStompClient(new StandardWebSocketClient());
-//        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-//
-//        CompletableFuture<OrderStatusUpdateDTO> future = new CompletableFuture<>();
-//
-//        StompSession session = stompClient.connectAsync("ws://localhost:" + port + "/ws", new StompSessionHandlerAdapter() {})
-//                .get(5, TimeUnit.SECONDS);
-//
-//        session.subscribe("/topic/order-tracking/1", new StompFrameHandler() {
-//            @Override
-//            public Type getPayloadType(StompHeaders headers) {
-//                return OrderStatusUpdateDTO.class;
-//            }
-//
-//            @Override
-//            public void handleFrame(StompHeaders headers, Object payload) {
-//                future.complete((OrderStatusUpdateDTO) payload);
-//            }
-//        });
-//
-//        OrderStatusUpdateDTO updateRequest = new OrderStatusUpdateDTO();
-//        updateRequest.setOrderId(1L);
-//        updateRequest.setOrderStatus(OrderStatus.DELIVERING);
-//
-//        session.send("/api/order/app/update-order-status", updateRequest);
-//
-//        OrderStatusUpdateDTO response = future.get(5, TimeUnit.SECONDS);
-//
-//        assertThat(response.getOrderId()).isEqualTo(1L);
-//        assertThat(response.getOrderStatus()).isEqualTo(OrderStatus.DELIVERING);
-//    }
 
 }

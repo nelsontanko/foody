@@ -1,6 +1,7 @@
 package dev.services.food;
 
 import dev.core.exception.GenericApiException;
+import dev.services.common.CacheService;
 import dev.services.food.FoodDTO.Request;
 import dev.services.food.FoodDTO.Response;
 import dev.services.food.FoodDTO.UpdateRequest;
@@ -24,6 +25,7 @@ class FoodServiceTest {
     @Mock FoodRepository foodRepository;
 
     @Mock FoodMapper foodMapper;
+    @Mock CacheService cacheService;
     @InjectMocks FoodService foodService;
 
     private Food food;
