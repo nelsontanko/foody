@@ -41,6 +41,7 @@
 - **PostgreSQL**: Primary database
 - **Flyway**: Database migrations
 - **Hibernate Validator**: Data validation
+- **Mapstruct**: Data mapping
 - **Spring Cache**: Caching mechanism
 - **JUnit 5**: Testing framework
 - **Mockito**: Mocking library for unit tests
@@ -60,8 +61,8 @@
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/vegaitassignments/NelsonTanko_Vega_FoodDelivery.git
-cd NelsonTanko_Vega_FoodDelivery
+git clone https://github.com/nelsontanko/foody.git
+cd foody
 ```
 
 ### Running with Docker 
