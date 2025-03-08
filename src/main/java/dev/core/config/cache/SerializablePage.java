@@ -3,6 +3,7 @@ package dev.core.config.cache;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.domain.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,7 +16,7 @@ import java.util.function.Function;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SerializablePage<T> implements Page<T>, Serializable {
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private List<T> content = new ArrayList<>();
     private int number;
