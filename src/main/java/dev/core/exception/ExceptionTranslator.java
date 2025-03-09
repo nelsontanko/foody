@@ -114,12 +114,6 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
             );
         }
 
-        if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) {
-            problem.setProperty(PATH_KEY, extractURI(request));
-        }
-
-        problem.setInstance(null);
-
         if ((err instanceof MethodArgumentNotValidException fieldException) &&
                 (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
         ) {
@@ -302,6 +296,6 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     private boolean containsPackageName(String message) {
         // This list is for sure not complete
-        return StringUtils.containsAny(message, "org.", "java.", "net.", "jakarta.", "javax.", "com.", "io.", "de.", "dev.venda");
+        return StringUtils.containsAny(message, "org.", "java.", "net.", "jakarta.", "javax.", "com.", "io.", "de.", "dev.");
     }
 }

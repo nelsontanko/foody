@@ -40,7 +40,7 @@ public class DomainUserDetailsService implements UserDetailsService {
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(User user) {
         if (!user.isActivated()) {
-            throw new UserNotActivatedException("User " + user + " was not activated");
+            throw new UserNotActivatedException("User was not activated");
         }
         List<SimpleGrantedAuthority> grantedAuthorities = user
                 .getAuthorities()

@@ -22,13 +22,13 @@ spring:
           authorities-claim-name: auth
   task:
     execution:
-      thread-name-prefix: venda-task-
+      thread-name-prefix: foody-task-
       pool:
         core-size: 1
         max-size: 50
         queue-capacity: 10000
     scheduling:
-      thread-name-prefix: venda-scheduling-
+      thread-name-prefix: foody-scheduling-
       pool:
         size: 20
   thymeleaf:

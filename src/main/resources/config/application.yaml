@@ -100,10 +100,6 @@ error:
     log-levels:
       5xx: ERROR
 
-local:
-  server:
-    port: 8080
-
 foody:
   clientApp:
     name: 'foodyApp'
