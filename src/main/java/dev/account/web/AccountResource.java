@@ -140,7 +140,7 @@ public class AccountResource {
      * @return the current user.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
-    @GetMapping
+    @GetMapping("/me")
     @ResponseStatus(OK)
     public AdminUserDTO getAccount() {
         return userAccountService

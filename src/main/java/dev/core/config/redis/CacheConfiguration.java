@@ -1,9 +1,13 @@
-package dev.core.config.cache;
+package dev.core.config.redis;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.jcache.configuration.CaffeineConfiguration;
 import dev.core.config.FoodyProperties;
 import dev.core.config.PrefixedKeyGenerator;
+import io.github.bucket4j.distributed.ExpirationAfterWriteStrategy;
+import io.github.bucket4j.redis.lettuce.cas.LettuceBasedProxyManager;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
 import org.hibernate.cache.jcache.ConfigSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,23 +84,6 @@ public class CacheConfiguration {
         return template;
     }
 
-//    @Bean
-//    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-//    CustomRedisSerializer customRedisSerializer = new CustomRedisSerializer();
-//
-//        RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-//                .entryTtl(Duration.ofSeconds(timeToLive))
-//                .disableCachingNullValues()
-//                .serializeKeysWith(
-//                        RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-//                .serializeValuesWith(
-//                        RedisSerializationContext.SerializationPair.fromSerializer(customRedisSerializer));
-//
-//        return RedisCacheManager.builder(redisConnectionFactory)
-//                .cacheDefaults(cacheConfiguration)
-//                .build();
-//    }
-
     /**
      * This can use either caffeine or redis as cache depending on the prefix
      *
@@ -124,6 +111,18 @@ public class CacheConfiguration {
                 .build();
 
         return new PrefixRoutingCacheManager(caffeineCacheManager, redisCacheManager);
+    }
+
+    @Bean
+    public RedisClient redisClient() {
+        return RedisClient.create(RedisURI.create(redisHost, redisPort));
+    }
+
+    @Bean
+    public LettuceBasedProxyManager proxyManager(RedisClient redisClient) {
+        return LettuceBasedProxyManager.builderFor(redisClient)
+                .withExpirationStrategy(ExpirationAfterWriteStrategy.fixedTimeToLive(Duration.ofHours(1)))
+                .build();
     }
 
     /**

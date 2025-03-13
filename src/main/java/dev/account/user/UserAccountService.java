@@ -143,6 +143,10 @@ public class UserAccountService {
                 });
     }
 
+    public Optional<User> findByEmail(String email){
+        return userAccountRepository.findOneByEmailIgnoreCase(email);
+    }
+
     public void changePassword(String currentClearTextPassword, String newPassword) {
         SecurityUtils.getCurrentUser()
                 .flatMap(userAccountRepository::findOneByEmailIgnoreCase)

@@ -34,4 +34,7 @@ public interface UserAccountRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query("UPDATE User u SET u.resetKey = NULL, u.resetDate = NULL WHERE u.resetDate <= :expirationTime")
     int removeExpiredResetKeys(LocalDateTime expirationTime);
+
+    @Query("DELETE FROM User u WHERE u.email = :createdUserEmail")
+    void deleteByEmail(String createdUserEmail);
 }

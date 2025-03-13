@@ -1,6 +1,7 @@
 package dev.services.order;
 
 import dev.BaseWebIntegrationTest;
+import dev.WithFoodyUser;
 import dev.account.user.Address;
 import dev.account.user.User;
 import dev.services.TestDataHelper;
@@ -18,7 +19,9 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,36 +31,24 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class OrderIntegrationWithRedisIT extends BaseWebIntegrationTest {
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    @Autowired private RedisTemplate<String, String> redisTemplate;
+    @Autowired private OrderCompletionService orderCompletionService;
 
-    @Autowired
-    private OrderCompletionService orderCompletionService;
+    @Autowired private RestaurantRepository restaurantRepository;
+    @Autowired private OrderRepository orderRepository;
 
-    @Autowired
-    private RestaurantRepository restaurantRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private CourierRepository courierRepository;
+    @Autowired private CourierRepository courierRepository;
     @Autowired RestaurantAvailabilityService availabilityService;
 
-    @Autowired
-    private TestDataHelper testDataHelper;
+    @Autowired private TestDataHelper testDataHelper;
 
     private static final String ORDER_INFO_KEY_PREFIX = "order:info:";
     private static final String RESTAURANT_LOCK_KEY = "restaurant:lock:";
 
     private Food testFood;
-    private User testUser;
 
     @BeforeEach
     void setUp() {
-        testUser = testDataHelper.createUser("user@example.com", Set.of("ROLE_USER"));
-        testDataHelper.createUser("newuser@example.com", Set.of("ROLE_USER"));
-
         testDataHelper.createRestaurant("Gummy Bites", true, true, 88.99, 330.98);
         testDataHelper.createRestaurant("Tasty Bites", true, true, 82.99, 322.98);
         testFood = testDataHelper.createFood();
@@ -135,7 +126,8 @@ class OrderIntegrationWithRedisIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    void completeOrderAndFreeRestaurant_DeletesRedisKey() {
+    @WithFoodyUser
+    void completeOrderAndFreeRestaurant_DeletesRedisKey(User testUser) {
         // Given
         Restaurant restaurant = testDataHelper.createRestaurant("Redis Delete Test", true, false, 40.7306, -73.9352);
 
@@ -157,7 +149,8 @@ class OrderIntegrationWithRedisIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    void redisKeyExpiration_TriggersListener() throws Exception {
+    @WithFoodyUser
+    void redisKeyExpiration_TriggersListener(User testUser) throws Exception {
         // Given
         // This test requires Redis keyspace notifications to be enabled
         // CONFIG SET notify-keyspace-events "Ex"

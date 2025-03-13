@@ -2,6 +2,7 @@ package dev.services.comment;
 
 import dev.services.comment.CommentDTO.Request;
 import dev.services.comment.CommentDTO.Response;
+import dev.services.common.RateLimit;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class CommentController {
     }
 
     @GetMapping("/food/{foodId}")
+    @RateLimit(strategy = "ip")
     public ResponseEntity<CommentPageDTO> getCommentsByFoodId(@PathVariable Long foodId,
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "1") int size) {
         CommentPageDTO commentPage = commentService.getCommentsByFoodId(foodId, page, size);

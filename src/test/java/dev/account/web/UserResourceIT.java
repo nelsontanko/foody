@@ -7,7 +7,6 @@ import dev.account.mapper.UserMapper;
 import dev.account.user.User;
 import dev.account.user.UserAccountRepository;
 import dev.account.user.UserAccountService;
-import dev.core.util.TestUtils;
 import dev.security.AuthoritiesConstants;
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.RandomStringUtils;

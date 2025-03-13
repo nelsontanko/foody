@@ -1,7 +1,4 @@
-package dev.core.config.cache;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+package dev.core.config.redis;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +11,9 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 
 import java.util.Collection;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PrefixRoutingCacheManagerTest {

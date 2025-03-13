@@ -2,8 +2,6 @@ package dev.account;
 
 import dev.account.user.Authority;
 
-import java.util.UUID;
-
 public class AuthorityTestSamples {
 
     public static Authority getAuthoritySample1() {

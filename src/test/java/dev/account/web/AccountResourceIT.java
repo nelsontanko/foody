@@ -92,7 +92,7 @@ class AccountResourceIT extends BaseWebIntegrationTest {
         userAccountService.createUser(user);
 
         this.mockMvc
-                .perform(get("/api/account").accept(APPLICATION_JSON))
+                .perform(get("/api/account/me").accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.email").value(TEST_USER_EMAIL))

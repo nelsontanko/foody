@@ -1,20 +1,17 @@
 package dev.services.food;
 
 import dev.BaseWebIntegrationTest;
+import dev.WithFoodyUser;
 import dev.account.user.User;
 import dev.services.TestDataHelper;
 import dev.services.food.FoodDTO.Request;
 import dev.services.food.FoodDTO.UpdateRequest;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -24,18 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WithMockUser(username = "user@example.com", authorities = {"ROLE_ADMIN"})
 class FoodControllerIT extends BaseWebIntegrationTest {
 
     @Autowired FoodRepository foodRepository;
     @Autowired TestDataHelper testDataHelper;
-
-    private User testUser;
-
-    @BeforeEach
-    void setUp() {
-       testUser = testDataHelper.createUser("user@example.com", Set.of("ROLE_ADMIN"));
-    }
 
     @AfterEach
     void cleanUp(){
@@ -43,6 +32,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void addFood_Success() throws Exception {
         Request foodRequest = Request.builder()
                 .name("Pizza Margherita")
@@ -59,6 +49,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void addFood_WithExistingFoodName_ShouldThrowException() throws Exception {
         testDataHelper.createFood();
         Request foodRequest = Request.builder()
@@ -74,6 +65,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void updateFood_Success() throws Exception {
         Food food = testDataHelper.createFood();
 
@@ -91,6 +83,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void updateFood_WithExistingFoodName_ShouldThrowException() throws Exception {
         testDataHelper.createFood("Diary blue", "Great product", BigDecimal.TWO,true);
         Food food = testDataHelper.createFood();
@@ -107,6 +100,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void deleteFood_Success() throws Exception {
         Food food = testDataHelper.createFood();
 
@@ -119,6 +113,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "user@example.com")
     void getFoodById_Success() throws Exception {
         Food food = testDataHelper.createFood();
         mockMvc.perform(get("/api/food/{foodId}", food.getId())
@@ -128,9 +123,10 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    void getFoodById_Success_WithDefaultComment() throws Exception {
+    @WithFoodyUser(email = "user@example.com")
+    void getFoodById_Success_WithDefaultComment(User user) throws Exception {
         Food food = testDataHelper.createFood();
-        testDataHelper.createFoodsWithComments(food, testUser);
+        testDataHelper.createFoodsWithComments(food, user);
 
         mockMvc.perform(get("/api/food/{foodId}", food.getId()))
                 .andExpect(status().isOk())
@@ -142,9 +138,11 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    void getFoodById_Success_WithProvidedCommentCount() throws Exception {
+    @WithFoodyUser(email = "user@example.com")
+    void getFoodById_Success_WithProvidedCommentCount(User user) throws Exception {
         Food food = testDataHelper.createFood();
-        testDataHelper.createFoodsWithComments(food, testUser);
+        testDataHelper.createFoodsWithComments(food, user);
+
         mockMvc.perform(get("/api/food/{foodId}", food.getId())
                         .param("comment_count", "2"))
                 .andExpect(status().isOk())
@@ -157,6 +155,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "user@example.com")
     void getFoodById_NotFound() throws Exception {
         mockMvc.perform(get("/api/food/{foodId}", 222))
                 .andExpect(status().isNotFound())
@@ -164,6 +163,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "user@example.com")
     void getAllFood_Success_WithDefaultPaginationAndFilters() throws Exception {
         testDataHelper.createMultipleFoods();
 
@@ -178,6 +178,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "user@example.com")
     void getAllFood_Success_WithPagination() throws Exception {
         testDataHelper.createMultipleFoods();
 
@@ -193,6 +194,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
+    @WithFoodyUser(email = "user@example.com")
     void getAllFood_Success_WithFilters() throws Exception {
         testDataHelper.createMultipleFoods();
 

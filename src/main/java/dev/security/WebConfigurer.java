@@ -1,6 +1,7 @@
 package dev.security;
 
 import dev.core.config.FoodyProperties;
+import dev.core.config.redis.RateLimitInterceptor;
 import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
 import org.slf4j.Logger;
@@ -13,6 +14,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Set;
 
@@ -23,7 +26,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
  */
 @Configuration
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
-public class WebConfigurer implements ServletContainerInitializer {
+public class WebConfigurer implements ServletContainerInitializer, WebMvcConfigurer {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebConfigurer.class);
 
@@ -31,9 +34,12 @@ public class WebConfigurer implements ServletContainerInitializer {
 
     private final FoodyProperties foodyProperties;
 
-    public WebConfigurer(Environment env, FoodyProperties foodyProperties) {
+    private final RateLimitInterceptor rateLimitInterceptor;
+
+    public WebConfigurer(Environment env, FoodyProperties foodyProperties, RateLimitInterceptor rateLimitInterceptor) {
         this.env = env;
         this.foodyProperties = foodyProperties;
+        this.rateLimitInterceptor = rateLimitInterceptor;
     }
 
     @Override
@@ -56,5 +62,11 @@ public class WebConfigurer implements ServletContainerInitializer {
             source.registerCorsConfiguration("/swagger-ui/**", config);
         }
         return new CorsFilter(source);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(rateLimitInterceptor)
+                .addPathPatterns("/api/**");
     }
 }

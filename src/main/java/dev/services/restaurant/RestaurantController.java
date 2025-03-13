@@ -1,5 +1,6 @@
 package dev.services.restaurant;
 
+import dev.services.common.RateLimit;
 import dev.services.restaurant.RestaurantDTO.Request;
 import dev.services.restaurant.RestaurantDTO.Response;
 import dev.services.restaurant.RestaurantDTO.UpdateRequest;
@@ -38,6 +39,7 @@ public class RestaurantController {
     }
 
     @GetMapping
+    @RateLimit
     public ResponseEntity<Page<Response>> getAllRestaurants(@PageableDefault(
             sort = {"createdDate"}, direction = Sort.Direction.DESC) final Pageable pageable) {
         return ResponseEntity.ok(restaurantService.getAllRestaurants(pageable));

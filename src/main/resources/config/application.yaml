@@ -92,6 +92,11 @@ server:
       cookie:
         http-only: true
 
+api:
+  rate-limit:
+    enabled: true
+    header: X-API-Key
+
 error:
   handling:
     http-status-in-json-response: true

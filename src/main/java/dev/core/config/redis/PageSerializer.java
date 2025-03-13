@@ -1,4 +1,4 @@
-package dev.core.config.cache;
+package dev.core.config.redis;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

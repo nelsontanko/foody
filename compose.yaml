@@ -45,6 +45,7 @@ services:
     image: 'redis:7.4'
     ports:
       - '6379:6379'
+    restart: unless-stopped
     networks:
       - foody-postgres-net
 

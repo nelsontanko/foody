@@ -1,4 +1,4 @@
-package dev.core.config.cache;
+package dev.core.config.redis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.domain.*;

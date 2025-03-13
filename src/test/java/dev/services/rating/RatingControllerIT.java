@@ -1,6 +1,7 @@
 package dev.services.rating;
 
 import dev.BaseWebIntegrationTest;
+import dev.WithFoodyUser;
 import dev.account.user.User;
 import dev.services.TestDataHelper;
 import dev.services.food.Food;
@@ -10,9 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,12 +23,10 @@ class RatingControllerIT extends BaseWebIntegrationTest {
 
     @Autowired TestDataHelper testDataHelper;
 
-    private User testUser;
     private Food testFood;
 
     @BeforeEach
     void setUp() {
-        testUser = testDataHelper.createUser("user@example.com", Set.of("ROLE_ADMIN"));
         testFood = testDataHelper.createFood();
     }
 
@@ -40,8 +36,8 @@ class RatingControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-    void addNewRating_Success() throws Exception {
+    @WithFoodyUser
+    void addNewRating_Success(User testUser) throws Exception {
         Request request = new Request(testFood.getId(), 5);
 
         mockMvc.perform(post("/api/rating")
@@ -54,8 +50,8 @@ class RatingControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-    void updateExistingRating_Success() throws Exception {
+    @WithFoodyUser
+    void updateExistingRating_Success(User testUser) throws Exception {
         testDataHelper.createRating(3, testFood, testUser);
 
         Request request = new Request(testFood.getId(), 4);
@@ -78,7 +74,7 @@ class RatingControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
+    @WithFoodyUser
     void addRating_InvalidValue_ReturnsBadRequest() throws Exception {
         Request request = new Request(testFood.getId(), 6); // Invalid rating
 

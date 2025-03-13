@@ -37,27 +37,13 @@ class   OrderControllerIT extends BaseWebIntegrationTest {
     void setUp() {
         testUser = testDataHelper.createUser("user@example.com", Set.of("ROLE_USER"));
         testFood = testDataHelper.createFood();
+        testDataHelper.createRestaurant("Test Restaurant", true, true, 76.88, 44.76);
     }
 
     @AfterEach
     void cleanUp(){
         testDataHelper.clearData();
     }
-
-//    @BeforeEach
-//    void setUp() {
-//        testUser = testDataHelper.createUser("user@example.com", Set.of("ROLE_USER"));
-//        testDataHelper.createUser("newuser@example.com", Set.of("ROLE_USER"));
-//
-//        testDataHelper.createRestaurant("Gummy Bites", true, true, 88.99, 330.98);
-//        testDataHelper.createRestaurant("Tasty Bites", true, true, 82.99, 322.98);
-//        testFood = testDataHelper.createFood();
-//    }
-//
-//    @AfterEach
-//    void cleanUp() {
-//        testDataHelper.clearData();
-//    }
 
 
     @Test

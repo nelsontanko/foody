@@ -1,17 +1,14 @@
 package dev.services.restaurant;
 
 import dev.BaseWebIntegrationTest;
+import dev.WithFoodyUser;
 import dev.services.TestDataHelper;
 import dev.services.restaurant.RestaurantDTO.Request;
 import dev.services.restaurant.RestaurantDTO.UpdateRequest;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -25,19 +22,13 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     @Autowired RestaurantRepository restaurantRepository;
     @Autowired TestDataHelper testDataHelper;
 
-    @BeforeEach
-    void setUp() {
-        testDataHelper.createUser("admin@example.com", Set.of("ROLE_ADMIN"));
-        testDataHelper.createUser("user@example.com", Set.of("ROLE_USER"));
-    }
-
     @AfterEach
     void cleanUp(){
         testDataHelper.clearData();
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = {"ROLE_ADMIN"})
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void createRestaurant_Success() throws Exception {
         Request restaurantRequest = testDataHelper.createRestaurant();
 
@@ -52,7 +43,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = {"ROLE_ADMIN"})
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void createRestaurant_DuplicateAddress_ShouldThrowException() throws Exception {
         Request restaurantRequest = testDataHelper.createRestaurant();
 
@@ -80,7 +71,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = {"ROLE_ADMIN"})
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void updateRestaurant_Success() throws Exception {
         Restaurant existingRestaurant = testDataHelper.createRestaurant("Tasty Bites", true, true, 78.99, 333.98);
         UpdateRequest updateRequest = new UpdateRequest();
@@ -97,7 +88,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = {"ROLE_ADMIN"})
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void updateRestaurant_AddCourier_Success() throws Exception {
         Restaurant existingRestaurant = testDataHelper.createRestaurant("Tasty Bites", true, true, 78.99, 333.98);
         CourierDTO.UpdateRequest courierRequest = new CourierDTO.UpdateRequest();
@@ -116,7 +107,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = {"ROLE_ADMIN"})
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void updateRestaurant_WithoutAvailableField_ShouldKeepPreviousValue() throws Exception {
         Restaurant existingRestaurant = testDataHelper.createRestaurant("Tasty Bites", true, true, 78.99, 333.98);
         UpdateRequest updateRequest = new UpdateRequest();
@@ -131,7 +122,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = {"ROLE_ADMIN"})
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void updateRestaurant_NotFound_ShouldThrowException() throws Exception {
         UpdateRequest updateRequest = new UpdateRequest();
         updateRequest.setName("Non-Existent Restaurant");
@@ -144,7 +135,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
+    @WithFoodyUser(email = "user@example.com")
     void getAllRestaurants_Success() throws Exception {
         testDataHelper.createRestaurant("Tasty Bites", true, true, 78.99, 333.98);
         testDataHelper.createRestaurant("Frosty Bites", true, false, 78.99, 333.98);
@@ -160,7 +151,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
+    @WithFoodyUser(email = "user@example.com")
     void getRestaurantById_Success() throws Exception {
         Restaurant restaurant = testDataHelper.createRestaurant("Tasty Bites", true, true, 78.99, 333.98);
 
@@ -171,7 +162,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
+    @WithFoodyUser(email = "user@example.com")
     void getRestaurantById_NotFound_ShouldThrowException() throws Exception {
         mockMvc.perform(get("/api/restaurant/{restaurantId}", 9999L)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -180,7 +171,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = {"ROLE_ADMIN"})
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void deleteRestaurant_Success() throws Exception {
         Restaurant restaurant = testDataHelper.createRestaurant("Tasty Bites", true, true, 78.99, 333.98);
 
@@ -194,7 +185,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", authorities = {"ROLE_ADMIN"})
+    @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void deleteRestaurant_NotFound_ReturnsError() throws Exception {
         mockMvc.perform(delete("/api/restaurant/{restaurantId}", 9999L)
                         .contentType(MediaType.APPLICATION_JSON))

@@ -1,18 +1,16 @@
 package dev.services.comment;
 
 import dev.BaseWebIntegrationTest;
+import dev.WithFoodyUser;
 import dev.account.user.User;
 import dev.services.TestDataHelper;
 import dev.services.comment.CommentDTO.Request;
 import dev.services.food.Food;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-
-import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,21 +24,14 @@ class CommentControllerIT extends BaseWebIntegrationTest {
 
     @Autowired TestDataHelper testDataHelper;
 
-    private User testUser;
-
-    @BeforeEach
-    void setUp() {
-        testUser = testDataHelper.createUser("user@example.com", Set.of("ROLE_USER"));
-    }
-
     @AfterEach
     void cleanUp(){
         testDataHelper.clearData();
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-    void addComment_Success() throws Exception {
+    @WithFoodyUser
+    void addComment_Success(User testUser) throws Exception {
         Food food = testDataHelper.createFood();
         Request request = Request.builder()
                 .content("Hello comet")
@@ -57,7 +48,7 @@ class CommentControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
+    @WithFoodyUser
     void addComment_WhenFoodNotFound_ShouldThrowException() throws Exception {
         Request request = Request.builder()
                 .content("Hello comet")
@@ -90,8 +81,8 @@ class CommentControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-    void getCommentsByFoodId_Success_WithDefaultPagination() throws Exception {
+    @WithFoodyUser
+    void getCommentsByFoodId_Success_WithDefaultPagination(User testUser) throws Exception {
         Food food = testDataHelper.createFood();
         testDataHelper.createFoodsWithComments(food, testUser);
 
@@ -105,8 +96,8 @@ class CommentControllerIT extends BaseWebIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
-    void getCommentsByFoodId_Success_WithProvidedCommentSize() throws Exception {
+    @WithFoodyUser
+    void getCommentsByFoodId_Success_WithProvidedCommentSize(User testUser) throws Exception {
         Food food = testDataHelper.createFood();
         testDataHelper.createFoodsWithComments(food, testUser);
 

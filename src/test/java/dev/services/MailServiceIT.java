@@ -1,7 +1,6 @@
 package dev.services;
 
 import dev.FoodyIntegrationTest;
-import dev.FoodyWebIntegrationTest;
 import dev.account.user.User;
 import dev.core.config.Constants;
 import dev.core.config.FoodyProperties;

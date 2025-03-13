@@ -42,7 +42,6 @@ public class TestDataHelper {
         orderRepository.deleteAll();
         restaurantRepository.deleteAll();
         foodRepository.deleteAll();
-        userAccountRepository.deleteAll();
     }
 
     public User createUser(String email, Set<String> roles) {

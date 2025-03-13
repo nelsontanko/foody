@@ -28,7 +28,7 @@ public enum ErrorCode {
     // Restaurant
     RESTAURANT_NOT_FOUND("api.restaurant.notFound", HttpStatus.NOT_FOUND),
     RESTAURANT_ALREADY_EXISTS("api.restaurant.AlreadyExists", HttpStatus.BAD_REQUEST),
-    RESTAURANT_UNAVAILABLE_FOR_DELIVERY("api.restaurant.noRestaurantAvailableForDelivery", HttpStatus.NOT_FOUND),
+    RESTAURANT_UNAVAILABLE_FOR_DELIVERY("api.restaurant.noRestaurantAvailableForDelivery", HttpStatus.CONFLICT),
     RESTAURANT_ADDRESS_ALREADY_EXISTS("api.restaurant.addressAlreadyExists", HttpStatus.BAD_REQUEST),
 
     // Food

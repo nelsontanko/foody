@@ -44,7 +44,7 @@ class WebConfigurerTest {
         env = new MockEnvironment();
         props = new FoodyProperties();
 
-        webConfigurer = new WebConfigurer(env, props);
+        webConfigurer = new WebConfigurer(env, props, null);
     }
 
     @Test

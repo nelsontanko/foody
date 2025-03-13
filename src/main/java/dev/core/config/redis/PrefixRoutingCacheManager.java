@@ -1,4 +1,4 @@
-package dev.core.config.cache;
+package dev.core.config.redis;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;

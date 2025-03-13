@@ -1,7 +1,4 @@
-package dev.core.config.cache;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+package dev.core.config.redis;
 
 import dev.BaseWebIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +10,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class CacheRoutingIntegrationTest extends BaseWebIntegrationTest {
 
