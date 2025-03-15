@@ -109,9 +109,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     private Bucket resolveBucket(String key, RateLimit rateLimitAnnotation) {
         BucketConfiguration configuration = configCache.computeIfAbsent(
                 key, k -> {
-                    Refill refill = Refill.intervally(rateLimitAnnotation.limit(),
-                            Duration.of(rateLimitAnnotation.duration(), ChronoUnit.SECONDS));
-                    Bandwidth bandwidth = Bandwidth.classic(rateLimitAnnotation.limit(), refill);
+                    long limit = rateLimitAnnotation.limit();
+                    Refill refill = Refill.intervally(limit, Duration.of(rateLimitAnnotation.duration(), ChronoUnit.SECONDS));
+                    Bandwidth bandwidth = Bandwidth.classic(limit, refill);
                     return BucketConfiguration.builder().addLimit(bandwidth).build();
                 });
 

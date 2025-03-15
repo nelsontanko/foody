@@ -55,6 +55,8 @@ public class PublicUserResource {
     }
 
     private boolean onlyContainsAllowedProperties(Pageable pageable) {
-        return pageable.getSort().stream().map(Sort.Order::getProperty).allMatch(ALLOWED_ORDERED_PROPERTIES::contains);
+        return pageable.getSort().stream()
+                .map(Sort.Order::getProperty)
+                .allMatch(ALLOWED_ORDERED_PROPERTIES::contains);
     }
 }
