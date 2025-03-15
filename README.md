@@ -39,6 +39,7 @@
 - **Spring Security**: Authentication and authorization
 - **Spring Data JPA**: Database operations
 - **PostgreSQL**: Primary database
+- **Redis**: Caching and message broker
 - **Flyway**: Database migrations
 - **Hibernate Validator**: Data validation
 - **Mapstruct**: Data mapping
@@ -70,14 +71,14 @@ cd foody
 To run the entire application stack using Docker:
 
 ```bash
-make docker-compose-up
+make up
 ```
 The application will be available at `http://localhost:8080`
 
 To stop all containers:
 
 ```bash
-make docker-compose-down
+make down
 ```
 
 ## API Documentation
@@ -115,8 +116,8 @@ make docker-logs        - Show logs from the Docker container
 make docker-shell       - Get a shell in the Docker container
 
 # Docker Compose operations
-make docker-compose-up  - Start all services with Docker Compose
-make docker-compose-down - Stop all services with Docker Compose
+make up                 - Start all services with Docker Compose
+make down               - Stop all services with Docker Compose
 
 # Database operations
 make db-connect         - Connect to PostgreSQL database

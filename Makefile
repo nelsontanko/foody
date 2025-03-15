@@ -10,7 +10,7 @@ endif
 DOCKER_COMPOSE = docker-compose -f compose.yaml
 
 .PHONY: help build clean test run test-integration \
-        docker-logs docker-shell docker-compose-up docker-compose-down db-connect
+        docker-logs docker-shell up down db-connect
 
 help:
 	@echo "Available commands:"
@@ -22,8 +22,8 @@ help:
 	@echo "  make docker-logs        - Show logs from the Docker container"
 	@echo "  make docker-shell       - Get a shell in the Docker container"
 	@echo "  make docker-push        - Push the Docker image to registry"
-	@echo "  make docker-compose-up  - Start all services with Docker Compose"
-	@echo "  make docker-compose-down - Stop all services with Docker Compose"
+	@echo "  make up  				 - Start all services with Docker Compose"
+	@echo "  make down 				 - Stop all services with Docker Compose"
 	@echo "  make db-connect         - Connect to PostgreSQL database"
 	@echo "  make redis              - Connect to Redis"
 	@echo "  make version            - Set version number for the build (make version VERSION=1.2.3)"
@@ -59,11 +59,11 @@ docker-logs:
 docker-shell:
 	docker exec -it $(APP_NAME) /bin/sh
 
-docker-compose-up:
+up:
 	$(DOCKER_COMPOSE) up -d --build
 	@echo "All services started"
 
-docker-compose-down:
+down:
 	$(DOCKER_COMPOSE) down
 	@echo "All services stopped"
 
