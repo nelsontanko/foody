@@ -31,6 +31,7 @@
 - **Search Functionality**: Find restaurants and menu items based on various criteria
 - **Caching**: Optimized performance using Spring Cache
 - **Scheduled Tasks**: Automated processes for order management and reporting
+- **Monitoring**: With Prometheus and Grafana
 
 ## Tech Stack
 
@@ -49,6 +50,7 @@
 - **Testcontainers**: Integration testing with containerized dependencies
 - **Docker**: Containerization
 - **Maven**: Build tools
+- **Prometheus and Grafana**: For monitoring
 
 ## Requirements
 
@@ -98,6 +100,11 @@ make test
 # Run only integration tests
 make test-integration
 ```
+
+## Monitoring
+
+For Prometheus dashboard, go to http://localhost:9090
+For Grafana dashboard, got to http://localhost:3000
 
 ## Available Commands
 
