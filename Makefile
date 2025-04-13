@@ -7,7 +7,7 @@ else
     MVN = ./mvnw
 endif
 
-DOCKER_COMPOSE = docker-compose -f compose.yaml
+DOCKER_COMPOSE = docker-compose -f compose.yml -f docker/monitoring.yml
 
 .PHONY: help build clean test run test-integration \
         docker-logs docker-shell up down db-connect
