@@ -10,7 +10,7 @@ spring:
     compose:
       enabled: true
       lifecycle-management: start-only
-      file: compose.yaml
+      file: compose.yml
   security:
     oauth2:
       resourceserver:
@@ -18,7 +18,7 @@ spring:
           authority-prefix: ''
           authorities-claim-name: auth
   jmx:
-    enabled: false
+    enabled: true
   data:
     jpa:
       repositories:
@@ -57,7 +57,7 @@ spring:
     redis:
       time-to-live: 3600
   redis:
-    host: localhost
+    host: redis
     port: 6379
     database: 0
     lettuce:
@@ -92,6 +92,87 @@ server:
       cookie:
         http-only: true
 
+#management:
+#  endpoints:
+#    web:
+#      base-path: /management
+#      exposure:
+#        include:
+#          - configprops
+#          - env
+#          - jhimetrics
+#          - jhiopenapigroups
+#          - logfile
+#          - loggers
+#          - prometheus
+#          - threaddump
+#          - caches
+#          - liquibase
+#  endpoint:
+#    health:
+#      show-details: when_authorized
+#      roles: 'ROLE_ADMIN'
+#      probes:
+#        enabled: true
+#      group:
+#        liveness:
+#          include: livenessState
+#        readiness:
+#          include: readinessState,db
+#  info:
+#    git:
+#      mode: full
+#    env:
+#      enabled: true
+#  health:
+#    mail:
+#      enabled: false # When using the MailService, configure an SMTP server and set this to true
+#  prometheus:
+#    metrics:
+#      export:
+#        enabled: true
+#        step: 60
+#  observations:
+#    key-values:
+#      application: ${spring.application.name}
+#  metrics:
+#    enable:
+#      http: true
+#      jvm: true
+#      logback: true
+#      process: true
+#      system: true
+#    distribution:
+#      percentiles-histogram:
+#        all: true
+#      percentiles:
+#        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+#    data:
+#      repository:
+#        autotime:
+#          enabled: true
+#    tags:
+#      application: ${spring.application.name}
+
+management:
+  endpoints:
+    web:
+      base-path: /management
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'
+  health:
+    probes:
+      enabled: true
+    show-details: always
+  info:
+    env:
+      enabled: true
+info:
+  app:
+    name: ${spring.application.name}
 api:
   rate-limit:
     enabled: true

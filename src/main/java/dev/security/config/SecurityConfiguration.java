@@ -73,7 +73,7 @@ public class SecurityConfiguration {
                         .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
                         .requestMatchers(mvc.pattern("/management/info")).permitAll()
                         .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
-                        .requestMatchers(mvc.pattern("/management/**")).hasAuthority(AuthoritiesConstants.ADMIN))
+                        .requestMatchers(mvc.pattern("/management/**")).permitAll()) // .hasAuthority(AuthoritiesConstants.ADMIN)
                 .sessionManagement(manager -> manager
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions ->
