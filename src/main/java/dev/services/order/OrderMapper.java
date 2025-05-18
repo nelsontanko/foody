@@ -1,6 +1,6 @@
 package dev.services.order;
 
-import dev.account.user.AddressMapper;
+import dev.account.mapper.AddressMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

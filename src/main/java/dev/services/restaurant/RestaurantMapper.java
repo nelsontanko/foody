@@ -1,6 +1,6 @@
 package dev.services.restaurant;
 
-import dev.account.user.AddressMapper;
+import dev.account.mapper.AddressMapper;
 import dev.services.restaurant.RestaurantDTO.UpdateRequest;
 import org.mapstruct.*;
 

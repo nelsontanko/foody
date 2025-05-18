@@ -1,5 +1,7 @@
-package dev.account.user;
+package dev.account.mapper;
 
+import dev.account.user.Address;
+import dev.account.user.AddressDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
