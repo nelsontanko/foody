@@ -26,6 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class TestUtils {
 
+    private TestUtils() {
+    }
+
     /**
      * Create a byte array with a specific size filled with specified data.
      *
@@ -42,78 +45,12 @@ public final class TestUtils {
     }
 
     /**
-     * A matcher that tests that the examined string represents the same instant as the reference datetime.
-     */
-    public static class ZonedDateTimeMatcher extends TypeSafeDiagnosingMatcher<String> {
-
-        private final ZonedDateTime date;
-
-        public ZonedDateTimeMatcher(ZonedDateTime date) {
-            this.date = date;
-        }
-
-        @Override
-        protected boolean matchesSafely(String item, Description mismatchDescription) {
-            try {
-                if (!date.isEqual(ZonedDateTime.parse(item))) {
-                    mismatchDescription.appendText("was ").appendValue(item);
-                    return false;
-                }
-                return true;
-            } catch (DateTimeParseException e) {
-                mismatchDescription.appendText("was ").appendValue(item).appendText(", which could not be parsed as a ZonedDateTime");
-                return false;
-            }
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("a String representing the same Instant as ").appendValue(date);
-        }
-    }
-
-    /**
      * Creates a matcher that matches when the examined string represents the same instant as the reference datetime.
      *
      * @param date the reference datetime against which the examined string is checked.
      */
     public static ZonedDateTimeMatcher sameInstant(ZonedDateTime date) {
         return new ZonedDateTimeMatcher(date);
-    }
-
-    /**
-     * A matcher that tests that the examined number represents the same value - it can be Long, Double, etc - as the reference BigDecimal.
-     */
-    public static class NumberMatcher extends TypeSafeMatcher<Number> {
-
-        final BigDecimal value;
-
-        public NumberMatcher(BigDecimal value) {
-            this.value = value;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("a numeric value is ").appendValue(value);
-        }
-
-        @Override
-        protected boolean matchesSafely(Number item) {
-            BigDecimal bigDecimal = asDecimal(item);
-            return bigDecimal != null && value.compareTo(bigDecimal) == 0;
-        }
-
-        private static BigDecimal asDecimal(Number item) {
-            return switch (item) {
-                case null -> null;
-                case BigDecimal bigDecimal -> bigDecimal;
-                case Long l -> BigDecimal.valueOf(l);
-                case Integer i -> BigDecimal.valueOf(i);
-                case Double v -> BigDecimal.valueOf(v);
-                case Float v -> BigDecimal.valueOf(v);
-                default -> BigDecimal.valueOf(item.doubleValue());
-            };
-        }
     }
 
     /**
@@ -190,6 +127,69 @@ public final class TestUtils {
         return (T) e.create();
     }
 
-    private TestUtils() {
+    /**
+     * A matcher that tests that the examined string represents the same instant as the reference datetime.
+     */
+    public static class ZonedDateTimeMatcher extends TypeSafeDiagnosingMatcher<String> {
+
+        private final ZonedDateTime date;
+
+        public ZonedDateTimeMatcher(ZonedDateTime date) {
+            this.date = date;
+        }
+
+        @Override
+        protected boolean matchesSafely(String item, Description mismatchDescription) {
+            try {
+                if (!date.isEqual(ZonedDateTime.parse(item))) {
+                    mismatchDescription.appendText("was ").appendValue(item);
+                    return false;
+                }
+                return true;
+            } catch (DateTimeParseException e) {
+                mismatchDescription.appendText("was ").appendValue(item).appendText(", which could not be parsed as a ZonedDateTime");
+                return false;
+            }
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("a String representing the same Instant as ").appendValue(date);
+        }
+    }
+
+    /**
+     * A matcher that tests that the examined number represents the same value - it can be Long, Double, etc - as the reference BigDecimal.
+     */
+    public static class NumberMatcher extends TypeSafeMatcher<Number> {
+
+        final BigDecimal value;
+
+        public NumberMatcher(BigDecimal value) {
+            this.value = value;
+        }
+
+        private static BigDecimal asDecimal(Number item) {
+            return switch (item) {
+                case null -> null;
+                case BigDecimal bigDecimal -> bigDecimal;
+                case Long l -> BigDecimal.valueOf(l);
+                case Integer i -> BigDecimal.valueOf(i);
+                case Double v -> BigDecimal.valueOf(v);
+                case Float v -> BigDecimal.valueOf(v);
+                default -> BigDecimal.valueOf(item.doubleValue());
+            };
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("a numeric value is ").appendValue(value);
+        }
+
+        @Override
+        protected boolean matchesSafely(Number item) {
+            BigDecimal bigDecimal = asDecimal(item);
+            return bigDecimal != null && value.compareTo(bigDecimal) == 0;
+        }
     }
 }

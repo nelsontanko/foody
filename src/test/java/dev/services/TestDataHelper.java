@@ -36,7 +36,7 @@ public class TestDataHelper {
     @Autowired private AddressRepository addressRepository;
     @Autowired private OrderItemRepository orderItemRepository;
 
-    public void clearData(){
+    public void clearData() {
         commentRepository.deleteAll();
         ratingRepository.deleteAll();
         orderRepository.deleteAll();
@@ -89,7 +89,7 @@ public class TestDataHelper {
         return restaurantRepository.saveAndFlush(restaurant);
     }
 
-    public RestaurantDTO.Request createRestaurant(){
+    public RestaurantDTO.Request createRestaurant() {
         return RestaurantDTO.Request.builder()
                 .name("Tasty Bites")
                 .email("tasty@abuja.ng")
@@ -97,17 +97,17 @@ public class TestDataHelper {
                 .address(createAddressRequest())
                 .courier(createCourierRequest())
                 .build();
-   }
+    }
 
-    public CourierDTO.Request createCourierRequest(){
+    public CourierDTO.Request createCourierRequest() {
         return new CourierDTO.Request("Tasty Bites Courier");
     }
 
-    public AddressDTO.Request createAddressRequest(){
+    public AddressDTO.Request createAddressRequest() {
         return new AddressDTO.Request("123 Main St", "Abuja", "Nigeria", 40.7128, -74.0060);
     }
 
-    public Food createFood(){
+    public Food createFood() {
         Food food = Food.builder()
                 .name("Pizza Margherita")
                 .description("Classic Italian pizza")
@@ -117,12 +117,12 @@ public class TestDataHelper {
         return foodRepository.saveAndFlush(food);
     }
 
-    public void createFoodsWithComments(Food food, User user){
+    public void createFoodsWithComments(Food food, User user) {
         createFoodComment("Very nice food", food, user);
         createFoodComment("Delicious", food, user);
     }
 
-    public void createMultipleFoods(){
+    public void createMultipleFoods() {
         createFood("Pizza Margherita", "Classic Italian pizza", new BigDecimal("12.99"), true);
         createFood("Olive Orange", "Niger Cuisine", new BigDecimal("222.99"), true);
         createFood("Banana Flush", "Benue Delight", new BigDecimal("50.55"), false);
@@ -138,7 +138,7 @@ public class TestDataHelper {
         foodRepository.saveAndFlush(food);
     }
 
-    public void createFoodComment(String content, Food food, User user){
+    public void createFoodComment(String content, Food food, User user) {
         Comment comment = Comment.builder()
                 .content(content)
                 .food(food)
@@ -147,7 +147,7 @@ public class TestDataHelper {
         commentRepository.saveAndFlush(comment);
     }
 
-    public void createRating(int rating, Food food, User user){
+    public void createRating(int rating, Food food, User user) {
         Rating newRating = Rating.builder()
                 .rating(rating)
                 .user(user)
@@ -175,10 +175,11 @@ public class TestDataHelper {
 //        return orderRepository.save(order);
 //    }
 
-    public Address createAddress(){
+    public Address createAddress() {
         Address address = Address.builder().city("Abuja").street("123 main").country("Nigeria").latitude(23.44).longitude(238.0).build();
         return addressRepository.saveAndFlush(address);
     }
+
     public Order createOrder(User user, Restaurant restaurant, Address deliveryAddress, Food food, int quantity) {
         Order order = new Order();
         order.setUser(user);

@@ -31,20 +31,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class OrderIntegrationWithRedisIT extends BaseWebIntegrationTest {
 
-    @Autowired private RedisTemplate<String, String> redisTemplate;
-    @Autowired private OrderCompletionService orderCompletionService;
-
-    @Autowired private RestaurantRepository restaurantRepository;
-    @Autowired private OrderRepository orderRepository;
-
-    @Autowired private CourierRepository courierRepository;
-    @Autowired RestaurantAvailabilityService availabilityService;
-
-    @Autowired private TestDataHelper testDataHelper;
-
     private static final String ORDER_INFO_KEY_PREFIX = "order:info:";
     private static final String RESTAURANT_LOCK_KEY = "restaurant:lock:";
-
+    @Autowired RestaurantAvailabilityService availabilityService;
+    @Autowired private RedisTemplate<String, String> redisTemplate;
+    @Autowired private OrderCompletionService orderCompletionService;
+    @Autowired private RestaurantRepository restaurantRepository;
+    @Autowired private OrderRepository orderRepository;
+    @Autowired private CourierRepository courierRepository;
+    @Autowired private TestDataHelper testDataHelper;
     private Food testFood;
 
     @BeforeEach
@@ -55,7 +50,7 @@ class OrderIntegrationWithRedisIT extends BaseWebIntegrationTest {
     }
 
     @AfterEach
-    void cleanUp(){
+    void cleanUp() {
         testDataHelper.clearData();
     }
 

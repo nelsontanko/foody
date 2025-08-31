@@ -3,6 +3,7 @@ package dev.services.rating;
 import dev.account.user.User;
 import dev.core.exception.ErrorCode;
 import dev.core.exception.GenericApiException;
+import dev.services.common.CacheService;
 import dev.services.food.Food;
 import dev.services.food.FoodRepository;
 import dev.services.rating.RatingDTO.Request;
@@ -20,12 +21,14 @@ public class RatingService {
     private final RatingRepository ratingRepository;
     private final FoodRepository foodRepository;
     private final RatingMapper ratingMapper;
+    private final CacheService cacheService;
     private final AuthenticatedUser auth;
 
-    public RatingService(RatingRepository ratingRepository, FoodRepository foodRepository, RatingMapper ratingMapper, AuthenticatedUser auth) {
+    public RatingService(RatingRepository ratingRepository, FoodRepository foodRepository, RatingMapper ratingMapper, CacheService cacheService, AuthenticatedUser auth) {
         this.ratingRepository = ratingRepository;
         this.foodRepository = foodRepository;
         this.ratingMapper = ratingMapper;
+        this.cacheService = cacheService;
         this.auth = auth;
     }
 
@@ -40,7 +43,7 @@ public class RatingService {
 
         food.calculateAverageRating();
         foodRepository.save(food);
-
+        cacheService.evictAllCacheEntries("food");
         return ratingMapper.toDto(rating);
     }
 

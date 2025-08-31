@@ -27,7 +27,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     @Autowired TestDataHelper testDataHelper;
 
     @AfterEach
-    void cleanUp(){
+    void cleanUp() {
         testDataHelper.clearData();
     }
 
@@ -85,7 +85,7 @@ class FoodControllerIT extends BaseWebIntegrationTest {
     @Test
     @WithFoodyUser(email = "admin@example.com", authorities = {"ROLE_ADMIN"})
     void updateFood_WithExistingFoodName_ShouldThrowException() throws Exception {
-        testDataHelper.createFood("Diary blue", "Great product", BigDecimal.TWO,true);
+        testDataHelper.createFood("Diary blue", "Great product", BigDecimal.TWO, true);
         Food food = testDataHelper.createFood();
 
         UpdateRequest request = new UpdateRequest();

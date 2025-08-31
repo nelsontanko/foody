@@ -25,15 +25,12 @@ import static dev.security.SecurityUtils.JWT_ALGORITHM;
 @Service
 public class AuthenticationService {
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationService.class);
-
-    @Value("${foody.security.authentication.jwt.token-validity-in-seconds:0}")
-    private long tokenValidityInSeconds;
-
-    @Value("${foody.security.authentication.jwt.token-validity-in-seconds-for-remember-me:0}")
-    private long tokenValidityInSecondsForRememberMe;
-
     private final JwtEncoder jwtEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    @Value("${foody.security.authentication.jwt.token-validity-in-seconds:0}")
+    private long tokenValidityInSeconds;
+    @Value("${foody.security.authentication.jwt.token-validity-in-seconds-for-remember-me:0}")
+    private long tokenValidityInSecondsForRememberMe;
 
     public AuthenticationService(JwtEncoder jwtEncoder, AuthenticationManagerBuilder authenticationManagerBuilder) {
         this.jwtEncoder = jwtEncoder;
@@ -43,8 +40,8 @@ public class AuthenticationService {
     /**
      * Authenticates a user and creates a JWT token
      *
-     * @param email the email
-     * @param password the password
+     * @param email      the email
+     * @param password   the password
      * @param rememberMe whether to extend the token validity
      * @return JWT token
      */

@@ -24,6 +24,14 @@ public class WithFoodyUserExtension implements BeforeEachCallback, AfterEachCall
     private static final String TEST_USER_KEY = "testUser";
     private static final String AUTH_KEY = "originalAuth";
 
+    /**
+     * Static helper method to get the test user from the current test context
+     */
+    public static User getTestUser(ExtensionContext context) {
+        Store store = context.getStore(NAMESPACE);
+        return store.get(TEST_USER_KEY, User.class);
+    }
+
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         // Store the original authentication
@@ -85,14 +93,6 @@ public class WithFoodyUserExtension implements BeforeEachCallback, AfterEachCall
             Authentication originalAuth = store.get(AUTH_KEY, Authentication.class);
             SecurityContextHolder.getContext().setAuthentication(originalAuth);
         }
-    }
-
-    /**
-     * Static helper method to get the test user from the current test context
-     */
-    public static User getTestUser(ExtensionContext context) {
-        Store store = context.getStore(NAMESPACE);
-        return store.get(TEST_USER_KEY, User.class);
     }
 
     @Override

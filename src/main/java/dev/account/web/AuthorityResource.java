@@ -31,11 +31,9 @@ public class AuthorityResource {
     private static final Logger LOG = LoggerFactory.getLogger(AuthorityResource.class);
 
     private static final String ENTITY_NAME = "adminAuthority";
-
+    private final AuthorityRepository authorityRepository;
     @Value("${foody.clientApp.name}")
     private String applicationName;
-
-    private final AuthorityRepository authorityRepository;
 
     public AuthorityResource(AuthorityRepository authorityRepository) {
         this.authorityRepository = authorityRepository;

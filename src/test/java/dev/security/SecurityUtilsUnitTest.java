@@ -34,6 +34,7 @@ class SecurityUtilsUnitTest {
         Optional<String> currentUserLogin = SecurityUtils.getCurrentUser();
         assertThat(currentUserLogin).contains("admin");
     }
+
     @Test
     void testGetCurrentUserJWT() {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();

@@ -17,14 +17,13 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.LOWER_CAME
 @Sql(value = {"/scripts/authority.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 public class BaseWebIntegrationTest {
 
-    @Autowired
-    protected MockMvc mockMvc;
-
     private static final ObjectMapper defaultObjectMapper =
             new ObjectMapper()
                     .registerModule(new JavaTimeModule())
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                     .setPropertyNamingStrategy(LOWER_CAMEL_CASE);
+    @Autowired
+    protected MockMvc mockMvc;
 
     protected static String toJSON(final Object object) throws JsonProcessingException {
         return defaultObjectMapper.writeValueAsString(object);

@@ -54,11 +54,11 @@ class PublicUserResourceIT extends BaseWebIntegrationTest {
     @AfterEach
     public void cleanupAndCheck() {
         cacheManager
-            .getCacheNames()
-            .stream()
-            .map(cacheName -> this.cacheManager.getCache(cacheName))
-            .filter(Objects::nonNull)
-            .forEach(Cache::clear);
+                .getCacheNames()
+                .stream()
+                .map(cacheName -> this.cacheManager.getCache(cacheName))
+                .filter(Objects::nonNull)
+                .forEach(Cache::clear);
         userService.deleteUser(user.getEmail());
         assertThat(userRepository.count()).isEqualTo(numberOfUsers);
         numberOfUsers = null;
@@ -72,13 +72,13 @@ class PublicUserResourceIT extends BaseWebIntegrationTest {
 
         // Get all the users
         mockMvc
-            .perform(get("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[?(@.id == %d)].email", user.getId()).value(user.getEmail()))
-            .andExpect(jsonPath("$.[?(@.id == %d)].keys()", user.getId()).value(Set.of("id", "email")))
-            .andExpect(jsonPath("$.[*].email").hasJsonPath())
-            .andExpect(jsonPath("$.[*].langKey").doesNotHaveJsonPath());
+                .perform(get("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.[?(@.id == %d)].email", user.getId()).value(user.getEmail()))
+                .andExpect(jsonPath("$.[?(@.id == %d)].keys()", user.getId()).value(Set.of("id", "email")))
+                .andExpect(jsonPath("$.[*].email").hasJsonPath())
+                .andExpect(jsonPath("$.[*].langKey").doesNotHaveJsonPath());
     }
 
     @Test
@@ -90,8 +90,8 @@ class PublicUserResourceIT extends BaseWebIntegrationTest {
         mockMvc.perform(get("/api/users?sort=resetKey,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
         mockMvc.perform(get("/api/users?sort=password,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
         mockMvc
-            .perform(get("/api/users?sort=resetKey,desc&sort=id,desc").accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
+                .perform(get("/api/users?sort=resetKey,desc&sort=id,desc").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
         mockMvc.perform(get("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
 }

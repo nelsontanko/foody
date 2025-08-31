@@ -48,7 +48,7 @@ public class UserAccountService {
         this.userMapper = userMapper;
     }
 
-    public User register(AdminUserDTO userDTO, String password){
+    public User register(AdminUserDTO userDTO, String password) {
         User newUser = createUser(userDTO, UserCreateConfig.builder()
                 .password(password)
                 .activated(false)
@@ -62,7 +62,7 @@ public class UserAccountService {
         return newUser;
     }
 
-    public Optional<User> activateAccount(String activationKey){
+    public Optional<User> activateAccount(String activationKey) {
         LOG.debug("Activating user for activation key {}", activationKey);
         return userAccountRepository.findOneByActivationKey(activationKey)
                 .map(user -> {
@@ -143,7 +143,7 @@ public class UserAccountService {
                 });
     }
 
-    public Optional<User> findByEmail(String email){
+    public Optional<User> findByEmail(String email) {
         return userAccountRepository.findOneByEmailIgnoreCase(email);
     }
 

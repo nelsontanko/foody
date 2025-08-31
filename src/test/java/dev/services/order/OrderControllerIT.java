@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Nelson Tanko
  */
 @Disabled(value = "Tests run in isolation (individually), a little tweak will be needed to make them run together")
-class   OrderControllerIT extends BaseWebIntegrationTest {
+class OrderControllerIT extends BaseWebIntegrationTest {
 
     @Autowired TestDataHelper testDataHelper;
     @Autowired OrderRepository orderRepository;
@@ -41,7 +41,7 @@ class   OrderControllerIT extends BaseWebIntegrationTest {
     }
 
     @AfterEach
-    void cleanUp(){
+    void cleanUp() {
         testDataHelper.clearData();
     }
 
@@ -139,9 +139,9 @@ class   OrderControllerIT extends BaseWebIntegrationTest {
     @Test
     @WithMockUser(username = "user@example.com", authorities = {"ROLE_USER"})
     void createOrder_AssignsNearestRestaurant() throws Exception {
-        testDataHelper.createRestaurant("Tasty Bites", true, true,40.7130, -74.0050);
-        testDataHelper.createRestaurant("Food Haven", true, true,40.7306, -73.9352);
-        testDataHelper.createRestaurant("Distant Deli",true, true, 40.7500, -73.8000);
+        testDataHelper.createRestaurant("Tasty Bites", true, true, 40.7130, -74.0050);
+        testDataHelper.createRestaurant("Food Haven", true, true, 40.7306, -73.9352);
+        testDataHelper.createRestaurant("Distant Deli", true, true, 40.7500, -73.8000);
 
         AddressDTO.Request deliveryAddress = new AddressDTO.Request("123 Main St", "Abuja", "Nigeria", 40.7128, -74.0060);
 

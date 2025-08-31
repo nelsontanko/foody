@@ -31,7 +31,7 @@ class RatingControllerIT extends BaseWebIntegrationTest {
     }
 
     @AfterEach
-    void cleanUp(){
+    void cleanUp() {
         testDataHelper.clearData();
     }
 

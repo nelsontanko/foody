@@ -25,7 +25,7 @@ class CommentControllerIT extends BaseWebIntegrationTest {
     @Autowired TestDataHelper testDataHelper;
 
     @AfterEach
-    void cleanUp(){
+    void cleanUp() {
         testDataHelper.clearData();
     }
 
@@ -39,8 +39,8 @@ class CommentControllerIT extends BaseWebIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/api/comment")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(toJSON(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJSON(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.content").value("Hello comet"))
                 .andExpect(jsonPath("$.userId").value(testUser.getId()))

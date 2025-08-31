@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static dev.security.AuthoritiesConstants.ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -48,6 +49,23 @@ class AccountResourceIT extends BaseWebIntegrationTest {
 
     @Autowired AuthorityMapper authorityMapper;
     private Long numberOfUsers;
+
+    static Stream<ManagedUserVM> invalidUsers() {
+        return Stream.of(
+                createInvalidUser("bobexample", "password", "Bob"), // <-- invalid
+                createInvalidUser("bob@example.com", "123", "Bob"), // password with only 3 digits
+                createInvalidUser("bob@example.com", null, "Bob D") // invalid null password
+        );
+    }
+
+    private static ManagedUserVM createInvalidUser(String email, String password, String fullname) {
+        ManagedUserVM invalidUser = new ManagedUserVM();
+        invalidUser.setPassword(password);
+        invalidUser.setFullname(fullname);
+        invalidUser.setEmail(email);
+        invalidUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        return invalidUser;
+    }
 
     @BeforeEach
     public void countUsers() {
@@ -82,7 +100,7 @@ class AccountResourceIT extends BaseWebIntegrationTest {
     @WithMockUser(TEST_USER_EMAIL)
     void testGetExistingAccount() throws Exception {
         Set<String> authorities = new HashSet<>();
-        authorities.add(AuthoritiesConstants.ADMIN);
+        authorities.add(ADMIN);
 
         AdminUserDTO user = new AdminUserDTO();
         user.setEmail(TEST_USER_EMAIL);
@@ -102,7 +120,8 @@ class AccountResourceIT extends BaseWebIntegrationTest {
 
     @Test
     void testGetUnknownAccount() throws Exception {
-        this.mockMvc.perform(get("/api/account").accept(MediaType.APPLICATION_PROBLEM_JSON)).andExpect(status().isUnauthorized());
+        this.mockMvc.perform(get("/api/account").accept(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -145,14 +164,6 @@ class AccountResourceIT extends BaseWebIntegrationTest {
         assertThat(user).isEmpty();
     }
 
-    static Stream<ManagedUserVM> invalidUsers() {
-        return Stream.of(
-                createInvalidUser("bobexample", "password", "Bob" ), // <-- invalid
-                createInvalidUser("bob@example.com", "123", "Bob" ), // password with only 3 digits
-                createInvalidUser("bob@example.com", null, "Bob D") // invalid null password
-        );
-    }
-
     @ParameterizedTest
     @MethodSource("invalidUsers")
     @Transactional
@@ -164,15 +175,6 @@ class AccountResourceIT extends BaseWebIntegrationTest {
 
         Optional<User> user = userAccountRepository.findOneByEmailIgnoreCase("bob@email.com");
         assertThat(user).isEmpty();
-    }
-
-    private static ManagedUserVM createInvalidUser(String email, String password, String fullname) {
-        ManagedUserVM invalidUser = new ManagedUserVM();
-        invalidUser.setPassword(password);
-        invalidUser.setFullname(fullname);
-        invalidUser.setEmail(email);
-        invalidUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
-        return invalidUser;
     }
 
     @Test
@@ -309,8 +311,8 @@ class AccountResourceIT extends BaseWebIntegrationTest {
 
         this.mockMvc
                 .perform(post("/api/account/change-password")
-                                .contentType(APPLICATION_JSON)
-                                .content(toJSON(new PasswordChangeDTO(currentPassword, "new password")))
+                        .contentType(APPLICATION_JSON)
+                        .content(toJSON(new PasswordChangeDTO(currentPassword, "new password")))
                 )
                 .andExpect(status().isOk());
 
@@ -334,8 +336,8 @@ class AccountResourceIT extends BaseWebIntegrationTest {
 
         this.mockMvc
                 .perform(post("/api/account/change-password")
-                                .contentType(APPLICATION_JSON)
-                                .content(toJSON(new PasswordChangeDTO(currentPassword, newPassword)))
+                        .contentType(APPLICATION_JSON)
+                        .content(toJSON(new PasswordChangeDTO(currentPassword, newPassword)))
                 )
                 .andExpect(status().isBadRequest());
 
@@ -359,8 +361,8 @@ class AccountResourceIT extends BaseWebIntegrationTest {
 
         this.mockMvc
                 .perform(post("/api/account/change-password")
-                                .contentType(APPLICATION_JSON)
-                                .content(toJSON(new PasswordChangeDTO(currentPassword, newPassword)))
+                        .contentType(APPLICATION_JSON)
+                        .content(toJSON(new PasswordChangeDTO(currentPassword, newPassword)))
                 )
                 .andExpect(status().isBadRequest());
 
@@ -436,8 +438,8 @@ class AccountResourceIT extends BaseWebIntegrationTest {
 
         this.mockMvc
                 .perform(post("/api/account/reset-password/finish")
-                                .contentType(APPLICATION_JSON)
-                                .content(toJSON(keyAndPassword))
+                        .contentType(APPLICATION_JSON)
+                        .content(toJSON(keyAndPassword))
                 )
                 .andExpect(status().isOk());
 
@@ -463,8 +465,8 @@ class AccountResourceIT extends BaseWebIntegrationTest {
 
         this.mockMvc
                 .perform(post("/api/account/reset-password/finish")
-                                .contentType(APPLICATION_JSON)
-                                .content(toJSON(keyAndPassword))
+                        .contentType(APPLICATION_JSON)
+                        .content(toJSON(keyAndPassword))
                 )
                 .andExpect(status().isBadRequest());
 

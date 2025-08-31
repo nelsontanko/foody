@@ -57,9 +57,8 @@ public class Authority implements Serializable, Persistable<String> {
         return !this.isPersisted;
     }
 
-    public Authority setIsPersisted() {
+    public void setIsPersisted() {
         this.isPersisted = true;
-        return this;
     }
 
     @Override

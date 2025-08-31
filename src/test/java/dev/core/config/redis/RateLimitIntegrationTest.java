@@ -22,15 +22,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Disabled("Flaky")
 class RateLimitIntegrationTest extends BaseWebIntegrationTest {
 
-    @Autowired protected TestDataHelper testDataHelper;
-
     @Container
     @ServiceConnection
     static GenericContainer<?> redisContainer = new GenericContainer<>(DockerImageName.parse("redis:7.4"))
             .withExposedPorts(6379);
+    @Autowired protected TestDataHelper testDataHelper;
 
     @AfterEach
-    void cleanUp(){
+    void cleanUp() {
         testDataHelper.clearData();
     }
 

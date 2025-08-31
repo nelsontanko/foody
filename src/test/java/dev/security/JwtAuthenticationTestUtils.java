@@ -26,16 +26,6 @@ public class JwtAuthenticationTestUtils {
 
     public static final String BEARER = "Bearer ";
 
-    @Bean
-    private HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
-        return new HandlerMappingIntrospector();
-    }
-
-    @Bean
-    private MeterRegistry meterRegistry() {
-        return new SimpleMeterRegistry();
-    }
-
     public static String createValidToken(String jwtKey) {
         return createValidTokenForUser(jwtKey, "anonymous");
     }
@@ -108,5 +98,15 @@ public class JwtAuthenticationTestUtils {
         Mac mac = Mac.getInstance("HmacSHA512");
         mac.init(secretKeySpec);
         return String.copyValueOf(Hex.encode(mac.doFinal(data.getBytes())));
+    }
+
+    @Bean
+    private HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
+        return new HandlerMappingIntrospector();
+    }
+
+    @Bean
+    private MeterRegistry meterRegistry() {
+        return new SimpleMeterRegistry();
     }
 }

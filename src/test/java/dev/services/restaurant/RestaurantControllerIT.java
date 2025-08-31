@@ -23,7 +23,7 @@ class RestaurantControllerIT extends BaseWebIntegrationTest {
     @Autowired TestDataHelper testDataHelper;
 
     @AfterEach
-    void cleanUp(){
+    void cleanUp() {
         testDataHelper.clearData();
     }
 

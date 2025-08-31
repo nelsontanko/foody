@@ -13,6 +13,7 @@ import java.security.Principal;
 
 /**
  * REST controller for authentication
+ *
  * @author Nelson Tanko
  */
 @RestController

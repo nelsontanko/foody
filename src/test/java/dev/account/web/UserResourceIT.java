@@ -69,11 +69,6 @@ public class UserResourceIT extends BaseWebIntegrationTest {
 
     private Long numberOfUsers;
 
-    @BeforeEach
-    public void countUsers() {
-        numberOfUsers = userAccountRepository.count();
-    }
-
     /**
      * Create a User.
      * <p>
@@ -97,6 +92,11 @@ public class UserResourceIT extends BaseWebIntegrationTest {
         User persistUser = createEntity();
         persistUser.setEmail(DEFAULT_EMAIL);
         return persistUser;
+    }
+
+    @BeforeEach
+    public void countUsers() {
+        numberOfUsers = userAccountRepository.count();
     }
 
     @BeforeEach

@@ -77,15 +77,11 @@ public class UserResource {
     );
 
     private static final Logger LOG = LoggerFactory.getLogger(UserResource.class);
-
+    private final UserAccountService userAccountService;
+    private final UserAccountRepository userAccountRepository;
+    private final MailService mailService;
     @Value("${foody.clientApp.name}")
     private String applicationName;
-
-    private final UserAccountService userAccountService;
-
-    private final UserAccountRepository userAccountRepository;
-
-    private final MailService mailService;
 
     public UserResource(UserAccountService userAccountService, UserAccountRepository userAccountRepository, MailService mailService) {
         this.userAccountService = userAccountService;
@@ -130,7 +126,7 @@ public class UserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated user.
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already in use.
      */
-    @PatchMapping({ "/users", "/users/{email}" })
+    @PatchMapping({"/users", "/users/{email}"})
     public ResponseEntity<AdminUserDTO> updateUser(@PathVariable(name = "email", required = false) String email,
                                                    @Valid @RequestBody AdminUserDTO userDTO
     ) {

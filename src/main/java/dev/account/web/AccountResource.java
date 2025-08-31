@@ -46,8 +46,16 @@ public class AccountResource {
         this.mailService = mailService;
     }
 
+    private static boolean isPasswordLengthInvalid(String password) {
+        return (
+                StringUtils.isEmpty(password) ||
+                        password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
+                        password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
+        );
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody ManagedUserVM managedUserVM){
+    public ResponseEntity<?> register(@Valid @RequestBody ManagedUserVM managedUserVM) {
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
@@ -61,7 +69,7 @@ public class AccountResource {
      * {@code GET  /activate} : activate the registered user.
      *
      * @param key the activation key.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be activated.
+     * @throws AccountResourceException {@code 500 (Internal Server Error)} if the user couldn't be activated.
      */
     @PostMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
@@ -138,7 +146,7 @@ public class AccountResource {
      * {@code GET  /account} : get the current user.
      *
      * @return the current user.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
+     * @throws AccountResourceException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
     @GetMapping("/me")
     @ResponseStatus(OK)
@@ -149,6 +157,12 @@ public class AccountResource {
                 .orElseThrow(() -> new AccountResourceException("User could not be found"));
     }
 
+    /**
+     * {@code GET  /auth-info} : get the current expanded ifo of the user.
+     *
+     * @return the current user info.
+     * @throws AccountResourceException {@code 500 (Internal Server Error)} if the user couldn't be returned.
+     */
     @GetMapping("/auth-info")
     public Map<String, Object> getAuthInfo() {
         Map<String, Object> result = new HashMap<>();
@@ -170,13 +184,5 @@ public class AccountResource {
 
         LOG.debug("Debug auth info: {}", result);
         return result;
-    }
-
-    private static boolean isPasswordLengthInvalid(String password) {
-        return (
-                StringUtils.isEmpty(password) ||
-                        password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
-                        password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
-        );
     }
 }

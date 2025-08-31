@@ -14,13 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserMapperTest {
 
+    private static final String DEFAULT_EMAIL = "johndoe@example.com";
     private UserMapper userMapper;
-
     private User user;
     private AdminUserDTO userDto;
-
-    private static final String DEFAULT_EMAIL = "johndoe@example.com";
-
 
     @BeforeEach
     void setUp() {

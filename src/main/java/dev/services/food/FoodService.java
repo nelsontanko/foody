@@ -51,8 +51,7 @@ public class FoodService {
                 });
         Food food = foodMapper.toEntity(request);
         Food saveFood = foodRepository.save(food);
-        cacheService.evictAllCacheEntries(CACHE_NAME)
-        ;
+        cacheService.evictAllCacheEntries(CACHE_NAME);
         LOG.info("Food added successfully with id: {}", saveFood.getId());
         return foodMapper.toDto(saveFood);
     }
