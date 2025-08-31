@@ -105,7 +105,7 @@ make test-integration
 ## Monitoring
 
 For Prometheus dashboard, go to http://localhost:9090
-For Grafana dashboard, got to http://localhost:3000
+For Grafana dashboard, go to http://localhost:3000
 
 ## Available Commands
 
