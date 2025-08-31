@@ -74,6 +74,7 @@ To run the entire application stack using Docker:
 
 ```bash
 make up
+make run
 ```
 The application will be available at `http://localhost:8080`
 
