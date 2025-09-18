@@ -25,12 +25,12 @@ public class JacksonConfiguration {
         final JavaTimeModule javaTime = new JavaTimeModule();
         javaTime.addSerializer(
             LocalTime.class,
-            new JsonSerializer<LocalTime>() {
-                @Override
-                public void serialize(LocalTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-                    gen.writeString(value.toString());
+                new JsonSerializer<>() {
+                    @Override
+                    public void serialize(LocalTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+                        gen.writeString(value.toString());
+                    }
                 }
-            }
         );
         return javaTime;
     }

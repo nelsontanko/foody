@@ -33,7 +33,7 @@ public class WithFoodyUserExtension implements BeforeEachCallback, AfterEachCall
     }
 
     @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    public void beforeEach(ExtensionContext context) {
         // Store the original authentication
         Store store = context.getStore(NAMESPACE);
         store.put(AUTH_KEY, SecurityContextHolder.getContext().getAuthentication());
@@ -43,6 +43,7 @@ public class WithFoodyUserExtension implements BeforeEachCallback, AfterEachCall
                 .getAnnotation(WithFoodyUser.class);
 
         if (annotation != null) {
+            String password = "password123";
             String email = annotation.email();
 
             ApplicationContext appContext = SpringExtension.getApplicationContext(context);
@@ -51,7 +52,7 @@ public class WithFoodyUserExtension implements BeforeEachCallback, AfterEachCall
 
             User newUser = new User();
             newUser.setEmail(email);
-            newUser.setPassword("password123");
+            newUser.setPassword(password);
 
             Set<Authority> authorities = new HashSet<>();
             for (String role : annotation.authorities()) {
@@ -72,7 +73,7 @@ public class WithFoodyUserExtension implements BeforeEachCallback, AfterEachCall
                         .toList();
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(
-                        email, "password123", grantedAuthorities);
+                        email, password, grantedAuthorities);
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

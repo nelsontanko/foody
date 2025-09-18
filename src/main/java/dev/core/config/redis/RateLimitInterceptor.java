@@ -57,7 +57,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         Bucket bucket = resolveBucket(key, rateLimit);
 
         if (bucket.tryConsume(1)) {
-            response.setHeader("X-Rate-Limit-Limit", String.valueOf(rateLimit.limit()));
+            response.setHeader("X-Rate-Limit", String.valueOf(rateLimit.limit()));
             response.setHeader("X-Rate-Limit-Remaining", String.valueOf(bucket.getAvailableTokens()));
             return true;
         } else {

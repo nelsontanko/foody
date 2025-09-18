@@ -2,6 +2,7 @@ package dev.core.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraints.Email;
 
 import java.util.regex.Pattern;
 
@@ -9,6 +10,7 @@ import java.util.regex.Pattern;
  * Custom email validator implementation that uses a comprehensive regex pattern
  * to validate email addresses without external dependencies.
  */
+@Email
 public class EmailConstraintValidator implements ConstraintValidator<ValidEmail, String> {
 
     private static final String EMAIL_REGEX =

@@ -35,7 +35,7 @@ public interface FoodyDefaults {
             }
         }
 
-        public interface ClientAuthorization {
+        interface ClientAuthorization {
             String accessTokenUri = null;
             String tokenServiceId = null;
             String clientId = null;

@@ -183,7 +183,7 @@ public class UserAccountService {
                 .map(user -> {
                     user.setPassword(passwordEncoder.encode(newPassword));
                     user.setResetKey(null);
-                    user.setResetDate(null);
+                    user.setResetDate(LocalDateTime.now());
                     this.clearUserCaches(user);
                     return user;
                 });

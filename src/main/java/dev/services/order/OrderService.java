@@ -63,8 +63,7 @@ public class OrderService {
 
         Order order = createNewOrder(user, restaurant, deliveryAddress, orderItems, totalAmount);
 
-        restaurantAvailabilityService.markRestaurantAsBusy(restaurant.getId(), order.getId(), order.getEstimatedDeliveryTime());
-        markRestaurantAndCourierAsBusy(restaurant);
+        markRestaurantAndCourierAsBusy(restaurant, order);
 
         LOG.info("Order created successfully with id: {}", order.getId());
         return orderMapper.toDto(order);
@@ -156,7 +155,8 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    private void markRestaurantAndCourierAsBusy(Restaurant restaurant) {
+    private void markRestaurantAndCourierAsBusy(Restaurant restaurant, Order order) {
+        restaurantAvailabilityService.markRestaurantAsBusy(restaurant.getId(), order.getId(), order.getEstimatedDeliveryTime());
         restaurant.markAsBusy();
         restaurant.getCourier().markAsBusy();
         restaurantRepository.save(restaurant);
